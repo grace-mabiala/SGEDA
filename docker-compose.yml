@@ -16,7 +16,7 @@ services:
       MYSQL_DATABASE: SGEDA
       MYSQL_USER: root
       MYSQL_PASSWORD: 'Cherubinmab@2001'
-      MYSQL_ROOT_PASSWORD: 'Cheruinmab@2001'
+      MYSQL_ROOT_PASSWORD: 'Cherubinmab@2001'
       
     ports:
       - "3306:3306"
