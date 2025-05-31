@@ -14,7 +14,7 @@ services:
     image: mysql:5.7
     environment:
       MYSQL_DATABASE: SGEDA
-      MYSQL_USER: root
+      MYSQL_USER: 'MABIALA'
       MYSQL_PASSWORD: 'Cherubinmab@2001'
       MYSQL_ROOT_PASSWORD: 'Cherubinmab@2001'
       
