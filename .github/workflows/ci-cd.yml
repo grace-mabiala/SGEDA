@@ -34,7 +34,7 @@ jobs:
     
     - name: Run tests
       env:
-        DATABASE_URL: mysql://root:@localhost:3306/SGEDA
+        DATABASE_URL: mysql://root:@127.0.0.1:3306/SGEDA
         DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
       run: |
         python manage.py test
@@ -56,7 +56,7 @@ jobs:
     - name: Deploy to PythonAnywhere
       run: |
         ssh ${{ secrets.PYTHONANYWHERE_USERNAME }}@ssh.pythonanywhere.com << EOF
-          cd ~/mon-projet-django
+          cd ~/SGEDA
           git pull origin main
           docker-compose down
           docker-compose up -d --build
