@@ -2,6 +2,8 @@ version: '3.8'
 
 services:
   web:
+    networks:
+      - app_network
     build: .
     ports:
       - "8000:8000"
@@ -11,6 +13,8 @@ services:
       - db
 
   db:
+    networks:
+      - app_network
     image: mysql:5.7
     environment:
       MYSQL_DATABASE: SGEDA
