@@ -1,0 +1,650 @@
+{% extends 'base.html' %}
+
+
+    {% block title %}
+    <title>SGEDA - Système de Gestion des Événements, Décisions et Actions</title>
+    <!-- Bootstrap 5 CSS -->
+    {% endblock %}
+
+
+{% block body %}
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --primary-light: #e6e9ff;
+            --secondary-color: #3f37c9;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --gray-color: #6c757d;
+            --border-color: #e0e0e0;
+        }
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .navbar-brand i {
+            margin-right: 8px;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 80px 0 60px;
+            margin-bottom: 40px;
+        }
+        
+        .page-header h1 {
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .card-formation {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .card-formation:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+        
+        .formation-img {
+            height: 180px;
+            object-fit: cover;
+            width: 100%;
+        }
+        
+        .formation-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .formation-badge.soon {
+            background-color: var(--warning-color);
+            color: white;
+        }
+        
+        .formation-badge.open {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .formation-badge.ended {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .formation-date {
+            display: flex;
+            align-items: center;
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .formation-date i {
+            margin-right: 8px;
+        }
+        
+        .formation-category {
+            display: inline-block;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .btn-formation {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-formation:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn-outline-formation {
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+            padding: 8px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-formation:hover {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+        
+        .filter-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-select {
+            height: 45px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-select:focus {
+            box-shadow: none;
+            border-color: var(--primary-color);
+        }
+        
+        .formation-duration {
+            display: flex;
+            align-items: center;
+            color: var(--gray-color);
+            font-size: 0.9rem;
+        }
+        
+        .formation-duration i {
+            margin-right: 8px;
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .pagination .page-link {
+            color: var(--primary-color);
+        }
+        
+        .footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: 60px;
+        }
+        
+        @media (max-width: 768px) {
+            .page-header {
+                padding: 60px 0 40px;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+
+
+ {% include "sgeda/partials/header.html" %}
+    <!-- Navigation -->
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1>Nos Formations</h1>
+                    <p class="lead mb-0">Découvrez notre catalogue de formations pour développer vos compétences</p>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mb-5">
+        <!-- Filters -->
+        <div class="filter-card">
+        <form id="formationFilterForm" method="post">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">Catégorie</label>
+                    <select name="categorie" class="form-select">
+                        <option value="" selected>Toutes catégories</option>
+                        <option value="Management">Management</option>
+                        <option value="Informatique">Informatique</option>
+                        <option value="Communication">Communication</option>
+                        <option value="Développement personnel">Développement personnel</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Statut</label>
+                    <select name="statut" class="form-select">
+                        <option value="" selected>Tous statuts</option>
+                        <option value="ouvert">Ouvert</option>
+                        <option value="Bientôt disponible">Bientôt disponible</option>
+                        <option value="Terminée">Fermé</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Format</label>
+                    <select name="format" class="form-select">
+                        <option value="" selected>Tous formats</option>
+                        <option value="En présentiel">En Présentiel</option>
+                        <option value="En ligne">En ligne</option>
+                        
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12 text-end">
+                    <button type="reset" class="btn btn-outline-secondary me-2">Réinitialiser</button>
+                    <button type="submit" class="btn btn-formation">Filtrer</button>
+                </div>
+            </div>
+        </form>
+    </div>
+        
+        <!-- Formations List -->
+        <div id="formationsContainer" class="row">
+            <!-- Formation 1 -->
+
+            {% for formation in formations %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card-formation card h-100">
+                    <img src="{{formation.image}}" class="formation-img">
+                    <span class="formation-badge open">{{formation.statut}}</span>
+                    <div class="card-body">
+                        <span class="formation-category">{{formation.categorie}}</span>
+                        <h5 class="card-title">{{formation.intitule}}</h5>
+                        <p class="card-text text-muted">{{formation.description |truncatechars:100}}</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="formation-date">
+                                <i class="fas fa-calendar-day"></i> {{formation.date_de_debut}}
+                            </div>
+                            <div class="formation-duration">
+                                <i class="fas fa-clock"></i> {{formation.duree}}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'detail_formation' formation.id %}" class="btn btn-outline-formation">Détails</a>
+                            <a href="{% url 'inscription' %}" class="btn btn-formation">S'inscrire</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <!-- Formation 2 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card-formation card h-100">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71" class="formation-img">
+                    <span class="formation-badge soon">Bientôt disponible</span>
+                    <div class="card-body">
+                        <span class="formation-category">Technologie</span>
+                        <h5 class="card-title">Nouveaux outils collaboratifs</h5>
+                        <p class="card-text text-muted">Maîtrisez les dernières plateformes de travail collaboratif pour améliorer votre productivité.</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="formation-date">
+                                <i class="fas fa-calendar-day"></i> 25-26 Juin 2023
+                            </div>
+                            <div class="formation-duration">
+                                <i class="fas fa-clock"></i> 2 jours
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="formation-details.html" class="btn btn-outline-formation">Détails</a>
+                            <button class="btn btn-formation" disabled>Bientôt</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formation 3 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card-formation card h-100">
+                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678" class="formation-img">
+                    <span class="formation-badge open">Inscriptions ouvertes</span>
+                    <div class="card-body">
+                        <span class="formation-category">Communication</span>
+                        <h5 class="card-title">Prise de parole en public</h5>
+                        <p class="card-text text-muted">Développez votre aisance orale et captiver votre auditoire lors de vos présentations.</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="formation-date">
+                                <i class="fas fa-calendar-day"></i> 5 Juillet 2023
+                            </div>
+                            <div class="formation-duration">
+                                <i class="fas fa-clock"></i> 1 jour
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="formation-details.html" class="btn btn-outline-formation">Détails</a>
+                            <a href="formation-inscription.html" class="btn btn-formation">S'inscrire</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formation 4 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card-formation card h-100">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f" class="formation-img">
+                    <span class="formation-badge ended">Terminée</span>
+                    <div class="card-body">
+                        <span class="formation-category">Technologie</span>
+                        <h5 class="card-title">Gestion de projet agile</h5>
+                        <p class="card-text text-muted">Apprenez les méthodologies agiles pour gérer vos projets avec flexibilité et efficacité.</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="formation-date">
+                                <i class="fas fa-calendar-day"></i> 10-12 Mai 2023
+                            </div>
+                            <div class="formation-duration">
+                                <i class="fas fa-clock"></i> 3 jours
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="formation-details.html" class="btn btn-outline-formation">Détails</a>
+                            <button class="btn btn-formation" disabled>Terminée</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formation 5 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card-formation card h-100">
+                    <img src="https://images.unsplash.com/photo-1521791136064-7986c2920216" class="formation-img">
+                    <span class="formation-badge open">Inscriptions ouvertes</span>
+                    <div class="card-body">
+                        <span class="formation-category">Développement personnel</span>
+                        <h5 class="card-title">Gestion du temps et priorités</h5>
+                        <p class="card-text text-muted">Optimisez votre organisation et augmentez votre productivité au quotidien.</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="formation-date">
+                                <i class="fas fa-calendar-day"></i> 8 Juillet 2023
+                            </div>
+                            <div class="formation-duration">
+                                <i class="fas fa-clock"></i> 1 jour
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="formation-details.html" class="btn btn-outline-formation">Détails</a>
+                            <a href="formation-inscription.html" class="btn btn-formation">S'inscrire</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Formation 6 -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card-formation card h-100">
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644" class="formation-img">
+                    <span class="formation-badge soon">Bientôt disponible</span>
+                    <div class="card-body">
+                        <span class="formation-category">Communication</span>
+                        <h5 class="card-title">Rédaction professionnelle</h5>
+                        <p class="card-text text-muted">Améliorez vos écrits professionnels pour une communication claire et efficace.</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="formation-date">
+                                <i class="fas fa-calendar-day"></i> 15-16 Août 2023
+                            </div>
+                            <div class="formation-duration">
+                                <i class="fas fa-clock"></i> 2 jours
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <a href="formation-details.html" class="btn btn-outline-formation">Détails</a>
+                            <button class="btn btn-formation" disabled>Bientôt</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">  <!-- 'justify-content-center' centers the pagination -->
+    <!-- First & Previous Links -->
+    {% if formations.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1" aria-label="First">&laquo;</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ formations.previous_page_number }}" aria-label="Previous">Prev</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&laquo;</span>  <!-- Disabled state -->
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link">Prev</span>
+      </li>
+    {% endif %}
+
+    <!-- Current Page Info -->
+    <li class="page-item active">
+      <span class="page-link">
+        {{ formations.number }} / {{ formations.paginator.num_pages }}
+      </span>
+    </li>
+
+    <!-- Next & Last Links -->
+    {% if formations.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ formations.next_page_number }}" aria-label="Next">Next</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ formations.paginator.num_pages }}" aria-label="Last">&raquo;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">Next</span>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link">&raquo;</span>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+    </div>
+
+{% include "sgeda/partials/footer.html" %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formationFilterForm');
+    const formationsContainer = document.getElementById('formationsContainer');
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'col-12 text-center my-5';
+    loadingIndicator.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div>';
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Afficher l'indicateur de chargement
+        formationsContainer.innerHTML = '';
+        formationsContainer.appendChild(loadingIndicator);
+        
+        // Récupérer les données du formulaire
+        const formData = new FormData(form);
+        // Envoyer la requête POST
+        fetch('/api/formations/search/', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            },
+            body:formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erreur serveur');
+            }
+            return response.json();
+        })
+        .then(data => {
+            formationsContainer.innerHTML = '';
+            
+            if (data.length === 0) {
+                const noResults = document.createElement('div');
+                noResults.className = 'col-12 text-center py-5';
+                noResults.innerHTML = '<p class="text-muted">Aucune formation ne correspond à vos critères de recherche.</p>';
+                formationsContainer.appendChild(noResults);
+                return;
+            }
+            
+            // Générer les cartes de formation
+            data.forEach(formation => {
+                const formationCard = createFormationCard(formation);
+                formationsContainer.appendChild(formationCard);
+            });
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            formationsContainer.innerHTML = '<div class="col-12 text-center py-5 text-danger">Une erreur est survenue lors de la recherche.</div>';
+        });
+    });
+
+    // Fonction pour créer une carte de formation
+    function createFormationCard(formation) {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-md-6 col-lg-4';
+        
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card-formation card h-100';
+        
+        const img = document.createElement('img');
+        let imageUrl=formation.image || 'https://via.placeholder.com/400x200';
+        if (imageUrl.includes('%3A')) {
+            imageUrl = decodeURIComponent(imageUrl);
+        }
+        
+        // Suppression du préfixe localhost si présent
+        if (imageUrl.startsWith('/')) {
+            imageUrl = imageUrl.replace('/', '');
+        }
+        img.src = imageUrl || 'https://via.placeholder.com/400x200';
+        img.className = 'formation-img';
+        img.alt = formation.intitule;
+        
+        const badgeSpan = document.createElement('span');
+        badgeSpan.className = 'formation-badge ' + getStatusClass(formation.statut);
+        badgeSpan.textContent = formation.statut;
+        
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body';
+        
+        const categorySpan = document.createElement('span');
+        categorySpan.className = 'formation-category';
+        categorySpan.textContent = formation.categorie;
+        
+        const titleH5 = document.createElement('h5');
+        titleH5.className = 'card-title';
+        titleH5.textContent = formation.intitule;
+        
+        const descP = document.createElement('p');
+        descP.className = 'card-text text-muted';
+        descP.textContent = formation.description.length > 100 
+            ? formation.description.substring(0, 100) + '...' 
+            : formation.description;
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'd-flex justify-content-between align-items-center mb-3';
+        
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'formation-date';
+        dateDiv.innerHTML = `<i class="fas fa-calendar-day"></i> ${formation.date_de_debut}`;
+        
+        const durationDiv = document.createElement('div');
+        durationDiv.className = 'formation-duration';
+        durationDiv.innerHTML = `<i class="fas fa-clock"></i> ${formation.duree}`;
+        
+        infoDiv.appendChild(dateDiv);
+        infoDiv.appendChild(durationDiv);
+        
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.className = 'd-flex justify-content-between';
+        
+        const detailsBtn = document.createElement('a');
+        detailsBtn.href = `/formations/${formation.id}`;
+        detailsBtn.className = 'btn btn-outline-formation';
+        detailsBtn.textContent = 'Détails';
+        
+        let actionBtn;
+        if (formation.statut === 'Inscriptions ouvertes') {
+            actionBtn = document.createElement('a');
+            actionBtn.href = `/inscription?formation=${formation.id}`;
+            actionBtn.className = 'btn btn-formation';
+            actionBtn.textContent = "S'inscrire";
+        } else if (formation.statut === 'Bientôt disponible') {
+            actionBtn = document.createElement('button');
+            actionBtn.className = 'btn btn-formation';
+            actionBtn.disabled = true;
+            actionBtn.textContent = 'Bientôt';
+        } else {
+            actionBtn = document.createElement('button');
+            actionBtn.className = 'btn btn-formation';
+            actionBtn.disabled = true;
+            actionBtn.textContent = 'Terminée';
+        }
+        
+        buttonsDiv.appendChild(detailsBtn);
+        buttonsDiv.appendChild(actionBtn);
+        
+        cardBody.appendChild(categorySpan);
+        cardBody.appendChild(titleH5);
+        cardBody.appendChild(descP);
+        cardBody.appendChild(infoDiv);
+        cardBody.appendChild(buttonsDiv);
+        
+        cardDiv.appendChild(img);
+        cardDiv.appendChild(badgeSpan);
+        cardDiv.appendChild(cardBody);
+        
+        colDiv.appendChild(cardDiv);
+        
+        return colDiv;
+    }
+    
+    function getStatusClass(status) {
+        const statusMap = {
+            'Inscriptions ouvertes': 'open',
+            'Bientôt disponible': 'soon',
+            'Terminée': 'ended'
+        };
+        return statusMap[status] || '';
+    }
+});
+</script>
+    
+    
+{% endblock %}

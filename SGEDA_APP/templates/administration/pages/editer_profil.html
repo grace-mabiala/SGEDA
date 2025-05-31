@@ -1,0 +1,233 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <!-- Header avec dégradé de couleur -->
+        <div class="card-header bg-gradient-primary py-4">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-user-edit fa-2x text-white me-3"></i>
+            <h2 class="h4 mb-0 text-white">Édition du profil</h2>
+          </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" action="" class="needs-validation" novalidate>
+          {% csrf_token %}
+          <div class="card-body p-4 p-md-5">
+            
+            <!-- Section Photo de profil avec hover effect -->
+            <div class="text-center mb-5">
+              <div class="position-relative d-inline-block">
+                {% if request.user.photo_de_profil %}
+                <a href="{{ request.user.photo_de_profil.url }}" class="d-block overflow-hidden rounded-circle profile-picture-container">
+                  <img src="{{ request.user.photo_de_profil.url }}" 
+                       class="profile-picture img-thumbnail shadow-sm" 
+                       width="150" 
+                       height="150" 
+                       alt="Photo de profil">
+                </a>
+                {% else %}
+                <img src="{% static 'images/default-user.png' %}" 
+                     class="profile-picture img-thumbnail shadow-sm rounded-circle" 
+                     width="150" 
+                     height="150" 
+                     alt="Default">
+                {% endif %}
+                <label class="btn btn-sm btn-dark rounded-pill position-absolute bottom-0 end-0 mb-0 me-0">
+                  <i class="fas fa-camera me-1"></i>
+                  <input type="file" name="photo" class="d-none" onchange="previewImage(this)">
+                </label>
+              </div>
+              <small class="text-muted d-block mt-2">Cliquez sur la photo pour la modifier</small>
+            </div>
+
+            <!-- Formulaire en 2 colonnes -->
+            <div class="row g-4">
+              <!-- Colonne gauche -->
+              <div class="col-md-6">
+                <div class="form-floating mb-3">
+                  <input type="text" 
+                         name="nom" 
+                         class="form-control" 
+                         id="nom" 
+                         value="{{ request.user.nom }}" 
+                         required
+                         placeholder="Nom">
+                  <label for="nom">Nom</label>
+                  <div class="invalid-feedback">
+                    Veuillez entrer votre nom.
+                  </div>
+                </div>
+
+                <div class="form-floating mb-3">
+                  <input type="text" 
+                         name="prenom" 
+                         class="form-control" 
+                         id="prenom" 
+                         value="{{ request.user.prenom }}" 
+                         required
+                         placeholder="Prénom">
+                  <label for="prenom">Prénom</label>
+                  <div class="invalid-feedback">
+                    Veuillez entrer votre prénom.
+                  </div>
+                </div>
+
+                <div class="form-floating mb-3">
+                  <input type="text" 
+                         name="role" 
+                         class="form-control" 
+                         id="role" 
+                         value="{{ request.user.role }}"
+                         placeholder="Rôle">
+                  <label for="role">Rôle</label>
+                </div>
+              </div>
+
+              <!-- Colonne droite -->
+              <div class="col-md-6">
+                <div class="form-floating mb-3">
+                  <input type="text" 
+                         name="fonction" 
+                         class="form-control" 
+                         id="fonction" 
+                         value="{{ request.user.fonction }}"
+                         placeholder="Fonction">
+                  <label for="fonction">Fonction</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                  <input type="text" 
+                         name="departement" 
+                         class="form-control" 
+                         id="departement" 
+                         value="{{ request.user.departement }}"
+                         placeholder="Département">
+                  <label for="departement">Département</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                  <input type="email" 
+                         name="email" 
+                         class="form-control" 
+                         id="email" 
+                         value="{{ request.user.email }}"
+                         placeholder="Email">
+                  <label for="email">Email</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Section mot de passe avec accordéon -->
+             <!-- Mot de passe -->
+             
+             <!-- Confirmation mot de passe -->
+             <div class="row ">
+               <div class="col-md-6">
+                 <input type="password" name="password"value="{{ request.user.mot_de_passe }}" class="form-control">
+                 <label for="password" class="form-label">Nouveau mot de passe </label>
+               </div>
+               
+               <div class="col-md-6">
+                 <input type="password" name="password_confirm" class="form-control">
+                 <label for="password_confirm" class="form-label">Confirmer mot de passe </label>
+               </div>
+         </div>
+
+            <!-- Boutons d'action -->
+            <div class="d-flex justify-content-between mt-5">
+              <button type="submit" class="btn btn-primary px-4 rounded-pill btn-hover-effect">
+                <i class="fas fa-save me-2"></i> Enregistrer
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .profile-picture-container {
+    transition: all 0.3s ease;
+  }
+  .profile-picture-container:hover {
+    transform: scale(1.05);
+  }
+  .profile-picture {
+    object-fit: cover;
+    transition: all 0.3s ease;
+  }
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #3a7bd5 0%, #00d2ff 100%);
+  }
+  .btn-hover-effect:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  .form-control:focus {
+    border-color: #3a7bd5;
+    box-shadow: 0 0 0 0.25rem rgba(58, 123, 213, 0.25);
+  }
+  .accordion-button:not(.collapsed) {
+    color: #3a7bd5;
+    background-color: rgba(58, 123, 213, 0.1);
+  }
+</style>
+
+<script>
+  // Prévisualisation de l'image
+  function previewImage(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.querySelector('.profile-picture').src = e.target.result;
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // Validation du formulaire
+  (function() {
+    'use strict';
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms)
+      .forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+  })();
+
+  // Indicateur de force du mot de passe
+  document.getElementById('password')?.addEventListener('input', function() {
+    const password = this.value;
+    const strengthBar = document.querySelector('.progress-bar');
+    let strength = 0;
+    
+    if (password.length > 0) strength += 20;
+    if (password.length >= 8) strength += 30;
+    if (/[A-Z]/.test(password)) strength += 20;
+    if (/[0-9]/.test(password)) strength += 20;
+    if (/[^A-Za-z0-9]/.test(password)) strength += 10;
+    
+    strengthBar.style.width = strength + '%';
+    
+    if (strength < 40) {
+      strengthBar.className = 'progress-bar bg-danger';
+    } else if (strength < 70) {
+      strengthBar.className = 'progress-bar bg-warning';
+    } else {
+      strengthBar.className = 'progress-bar bg-success';
+    }
+  });
+</script>
+
+{% endblock %}

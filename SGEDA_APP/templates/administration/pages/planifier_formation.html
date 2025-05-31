@@ -1,0 +1,210 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  }
+
+  .form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+  }
+
+  .form-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+
+  .form-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    padding: 1.5rem;
+    border-bottom: none;
+  }
+
+  .form-body {
+    padding: 2rem;
+    background-color: white;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  }
+
+  textarea.form-control {
+    min-height: 120px;
+  }
+
+  .btn-submit {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-submit:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-2px);
+  }
+</style>
+
+<div class="container">
+  <div class="form-container">
+    <div class="form-card">
+      <div class="form-header">
+        <h3><i class="fas fa-chalkboard-teacher me-2"></i> Planifier une Formation</h3>
+      </div>
+      
+      <div class="form-body">
+        <form method="post" action="{% url 'planifier_evenement' %}">
+          {% if formation %}
+            <input type="hidden" name="id" value="{{ formation.id }}">
+          {% endif %}
+          <input type="hidden" name="categorie" value="formation">
+          {% csrf_token %}
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="intitule">Intitulé</label>
+                <input type="text" name="intitule" id="intitule" class="form-control" required>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="duree">Durée</label>
+                <input type="text" name="duree" id="duree" class="form-control" required>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="objectif">Objectif</label>
+            <input type="text" name="objectif" id="objectif" class="form-control" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea name="description" id="description" class="form-control" rows="4"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="prerequis">Prérequis</label>
+            <textarea name="prerequis" id="prerequis" class="form-control" rows="4"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="programme">Programme</label>
+            <textarea name="programme" id="programme" class="form-control" rows="4"></textarea>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="modalite">Modalité</label>
+                <select name="modalite" id="modalite" class="form-control">
+                  {% for code,nom in STATUT_CHOICES3 %}
+                    <option value="{{ code }}">{{ nom }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="id_Utilisateur">Formateur</label>
+                <select name="id_Utilisateur" id="id_Utilisateur" class="form-control">
+                  {% for utilisateur in utilisateurs %}
+                    <option value="{{ utilisateur.id }}">{{ utilisateur.nom }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="salle">Salle</label>
+                <select name="salle" id="salle" class="form-control">
+                  {% for salle in salles %}
+                    <option value="{{ salle.numero }}">{{ salle.nom }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="debut">Date de début</label>
+                <input type="datetime-local" name="debut" id="debut" class="form-control" required>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="fin">Date de fin</label>
+                <input type="datetime-local" name="fin" id="fin" class="form-control" required>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="public_cible">Public cible</label>
+            <input type="text" name="public_cible" id="public_cible" class="form-control" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="statut">Statut</label>
+            <select name="statut" id="statut" class="form-control">
+              {% for code,statut in STATUT_CHOICES2 %}
+                <option value="{{ code }}">{{ statut }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="text-end mt-4">
+            <button type="submit" class="btn-submit">Enregistrer la formation</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>SGEDA - Détails Formation</title>
+{% endblock %}
+
+{% block body %}
+<style>
+    .formation-hero {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: rgb(19, 18, 18);
+        padding: 5rem 0;
+        clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+        margin-bottom: 3rem;
+    }
+    
+    .formation-badge {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    
+    .detail-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+    
+    .formation-tabs .nav-link {
+        color: var(--dark-color);
+        font-weight: 500;
+        border: none;
+        padding: 1rem 1.5rem;
+    }
+    
+    .formation-tabs .nav-link.active {
+        color: var(--primary-color);
+        border-bottom: 3px solid var(--primary-color);
+        background: transparent;
+    }
+    
+    .instructor-card {
+        text-align: center;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        background-color: white;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .instructor-img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 1rem;
+        border: 3px solid var(--primary-light);
+    }
+    
+    .schedule-item {
+        display: flex;
+        padding: 1.5rem;
+        border-left: 3px solid var(--primary-color);
+        margin-bottom: 1rem;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+    
+    .schedule-time {
+        flex: 0 0 120px;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+    
+    .schedule-content {
+        flex: 1;
+    }
+    
+    .cta-section {
+        background-color: var(--primary-light);
+        border-radius: var(--border-radius);
+        padding: 3rem;
+        text-align: center;
+        margin: 3rem 0;
+    }
+    
+    @media (max-width: 768px) {
+        .formation-hero {
+            padding: 3rem 0;
+            clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+        }
+        
+        .schedule-item {
+            flex-direction: column;
+        }
+        
+        .schedule-time {
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+  {% include "sgeda/partials/header.html" %}
+<div class="formation-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <span class="formation-badge">{{ formation.categorie }}</span>
+                <h1 class="display-4 fw-bold mb-3">{{ formation.intitule }}</h1>
+                <div class="d-flex flex-wrap align-items-center mb-4">
+                    <div class="d-flex align-items-center me-4 mb-2">
+                        <i class="far fa-calendar-alt me-2"></i>
+                        <span>{{ formation.date_de_debut }} - {{ formation.date_de_fin }}</span>
+                    </div>
+                    <div class="d-flex align-items-center me-4 mb-2">
+                        <i class="far fa-clock me-2"></i>
+                        <span>{{ formation.duree }}</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        <span>{{ formation.salle.nom }}</span>
+                    </div>
+                </div>
+                <a href="#" class="btn btn-light btn-lg px-4 me-2">
+                    <i class="fas fa-user-plus me-2"></i>S'inscrire
+                </a>
+                <a href="#programme" class="btn btn-outline-light btn-lg px-4">
+                    <i class="fas fa-list-ol me-2"></i>Voir le programme
+                </a>
+            </div>
+            <div class="col-lg-4 d-none d-lg-block">
+                <img src="{{ formation.image.url }}" alt="{{ formation.intitule }}" class="img-fluid rounded-4 shadow">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="detail-card card mb-4">
+                <div class="card-body">
+                    <ul class="nav formation-tabs mb-4" id="formationTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">Description</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="programme-tab" data-bs-toggle="tab" data-bs-target="#programme" type="button" role="tab">Programme</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="prerequis-tab" data-bs-toggle="tab" data-bs-target="#prerequis" type="button" role="tab">Prérequis</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="avantages-tab" data-bs-toggle="tab" data-bs-target="#avantages" type="button" role="tab">Avantages</button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="formationTabContent">
+                        <div class="tab-pane fade show active" id="description" role="tabpanel">
+                            <h4 class="mb-3">À propos de cette formation</h4>
+                            <p class="lead">{{ formation.description | linebreaks }}</p>
+                            
+                            <h4 class="mt-5 mb-3">Objectifs pédagogiques</h4>
+                            <ul class="list-unstyled">
+                                
+                                <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> {{ formation.objectif }}</li>
+                               
+                            </ul>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="programme" role="tabpanel">
+                            <h4 class="mb-4" id="programme">Programme détaillé</h4>
+                            <p>{{formation.programme}}</p>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="prerequis" role="tabpanel">
+                            <h4 class="mb-3">Prérequis</h4>
+                            <p>{{ formation.prerequis|linebreaks }}</p>
+                            
+                            <h4 class="mt-5 mb-3">Public cible</h4>
+                            <p>{{ formation.public_cible|linebreaks }}</p>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="avantages" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="h-100 p-4 bg-light rounded-3">
+                                        <h5><i class="fas fa-certificate text-primary me-2"></i> Certification</h5>
+                                        <p class="mb-0">Une attestation de formation sera délivrée à l'issue de la session.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="h-100 p-4 bg-light rounded-3">
+                                        <h5><i class="fas fa-coffee text-primary me-2"></i> Accueil</h5>
+                                        <p class="mb-0">Petit-déjeuner, déjeuner et pauses café inclus pour les formations en présentiel.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="h-100 p-4 bg-light rounded-3">
+                                        <h5><i class="fas fa-book text-primary me-2"></i> Supports</h5>
+                                        <p class="mb-0">Accès à l'espace participant avec tous les supports de formation.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="h-100 p-4 bg-light rounded-3">
+                                        <h5><i class="fas fa-headset text-primary me-2"></i> Accompagnement</h5>
+                                        <p class="mb-0">Un mois d'accompagnement post-formation inclus.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-card card mb-4">
+                <div class="card-body">
+                    <h4 class="mb-4">Témoignages</h4>
+                    <div class="row">
+                        {% for temoignage in formation.temoignages.all %}
+                        <div class="col-md-6 mb-4">
+                            <div class="h-100 p-3 bg-light rounded-3">
+                                <div class="d-flex align-items-center mb-3">
+                                    <img src="{{ temoignage.photo }}" alt="{{ temoignage.nom }}" class="rounded-circle me-3" width="50">
+                                    <div>
+                                        <h6 class="mb-0">{{ temoignage.nom }}</h6>
+                                        <small class="text-muted">{{ temoignage.poste }}, {{ temoignage.entreprise }}</small>
+                                    </div>
+                                </div>
+                                <p class="mb-0">"{{ temoignage.contenu }}"</p>
+                                <div class="mt-2 text-warning">
+                                    {% for i in "12345"|make_list %}
+                                        {% if forloop.counter <= temoignage.note %}
+                                            <i class="fas fa-star"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="detail-card card mb-4">
+                <div class="card-body">
+                    <h4 class="mb-4">Formateur</h4>
+                    <div class="instructor-card">
+                        <img src="{{ formation.intervenant.photo_de_profil.url }}" alt="{{ formation.formateur.nom }}" class="instructor-img">
+                        <h5>{{ formation.formateur.nom }}</h5>
+                        <p class="text-muted">{{ formation.formateur.specialite }}</p>
+                        <p class="mb-4">{{ formation.formateur.bio|truncatewords:30 }}</p>
+                        <a href="{% url 'afficher_profil' formation.intervenant.id %}" class="btn btn-outline-primary" >Voir plus</a>
+                        <div class="collapse mt-3" id="formateur-details">
+                            <p>{{ formation.formateur.bio }}</p>
+                            <div class="d-flex justify-content-center">
+                                {% if formation.formateur.linkedin %}
+                                <a href="{{ formation.formateur.linkedin }}" class="btn btn-sm btn-outline-primary me-2" target="_blank">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                                {% endif %}
+                                {% if formation.formateur.twitter %}
+                                <a href="{{ formation.formateur.twitter }}" class="btn btn-sm btn-outline-info" target="_blank">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="detail-card card mb-4">
+                <div class="card-body">
+                    <h4 class="mb-4">Informations pratiques</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 text-primary">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Lieu</h6>
+                                    <p class="mb-0">{{ formation.salle.nom }}</p>
+                                    {% if formation.adresse %}
+                                    <a href="https://maps.google.com/?q={{ formation.adresse }}" target="_blank" class="small">Voir sur la carte</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 text-primary">
+                                    <i class="fas fa-calendar-day"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Dates et horaires</h6>
+                                    <p class="mb-0">
+                                        Du {{ formation.date_de_debut }} au {{ formation.date_de_fin }}<br>
+                                        {{ formation.heures }}
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 text-primary">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Participants</h6>
+                                    <p class="mb-0">
+                                        Min: {{ formation.participants_min }} - Max: {{ formation.participants_max }}<br>
+                                        <span class="text-success">{{ nbr_participant }} inscrits</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <!-- <div class="flex-shrink-0 text-primary">
+                                    <i class="fas fa-tag"></i>
+                                </div> -->
+                                <!-- <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Tarif</h6>
+                                    <p class="mb-0">
+                                        <span class="h5">{{ formation.prix }} € HT</span><br>
+                                        <small class="text-muted">Soit {{ formation.prix_ttc }} € TTC</small>
+                                    </p>
+                                </div> -->
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="detail-card card">
+                <div class="card-body">
+                    <h4 class="mb-4">Formations similaires</h4>
+                    {% for similaire in formations_similaires %}
+                    <div class="d-flex mb-3">
+                        <div class="flex-shrink-0">
+                            <img src="{{ similaire.image }}" alt="{{ similaire.intitule }}" width="80" class="rounded-3">
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1">{{ similaire.intitule }}</h6>
+                            <small class="text-muted d-block mb-1">
+                                <i class="far fa-calendar-alt me-1"></i> {{ similaire.date_de_debut }}
+                            </small>
+                            <a href="{% url 'formation_detail' similaire.id %}" class="btn btn-sm btn-outline-primary">Voir</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="cta-section">
+        <h3 class="mb-3">Prêt à vous inscrire ?</h3>
+        <p class="lead mb-4">Rejoignez cette formation et développez vos compétences dès maintenant</p>
+        <a href="#" class="btn btn-primary btn-lg px-5">
+            <i class="fas fa-user-plus me-2"></i>S'inscrire maintenant
+        </a>
+    </div>
+</div>
+
+{% include "sgeda/partials/footer.html" %}
+{% endblock %}

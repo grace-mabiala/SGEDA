@@ -1,0 +1,92 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<style>
+  /* Mêmes styles que pour le formulaire de formation */
+</style>
+
+<div class="container">
+  <div class="form-container">
+    <div class="form-card">
+      <div class="form-header">
+        <h3><i class="fas fa-tasks me-2"></i> Planifier une Action</h3>
+      </div>
+      
+      <div class="form-body">
+        <form method="post" action="{% url 'planifier_action' %}">
+          <input type="hidden" name="categorie" value="action">
+          {% csrf_token %}
+          
+          <div class="form-group">
+            <label for="titre">Titre</label>
+            <input type="text" name="titre" id="titre" class="form-control" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea name="description" id="description" class="form-control" rows="4" required></textarea>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="deadline">Deadline</label>
+                <input type="date" name="deadline" id="deadline" class="form-control" required>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="statut">Statut</label>
+                <select name="statut" id="statut" class="form-control" required>
+                  {% for code,statut in STATUT_CHOICES1 %}
+                    <option value="{{ code }}">{{ statut }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="commentaire">Commentaire</label>
+            <textarea name="commentaire" id="commentaire" class="form-control" rows="3"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="assignateur">Assignateur</label>
+            <input type="text" value="{{ request.user.nom }}" class="form-control" disabled>
+            <input type="hidden" name="assignateur" value="{{ request.user.id }}">
+          </div>
+          
+          <div class="form-group">
+            <label for="executeur">Exécuteur</label>
+            <select name="executeur" id="executeur" class="form-control">
+              {% for utilisateur in utilisateurs %}
+                <option value="{{ utilisateur.id }}">{{ utilisateur.nom }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="decision">Décision associée</label>
+            <select name="decision" id="decision" class="form-control" required>
+              {% for decision in decisions %}
+                <option value="{{ decision.id }}">{{ decision.titre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="text-end mt-4">
+            <button type="submit" class="btn-submit">Enregistrer l'action</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% endblock %}

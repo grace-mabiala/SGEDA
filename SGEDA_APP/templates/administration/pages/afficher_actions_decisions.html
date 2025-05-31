@@ -1,0 +1,213 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<style>
+  body {
+    background-color: #f4f6f9;
+  }
+
+  .section-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 10px;
+    margin-bottom: 30px;
+  }
+
+  .event-card {
+    border: none;
+    border-left: 4px solid #0d6efd;
+    border-radius: 10px;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .badge-action {
+    background-color: #0d6efd;
+  }
+
+  .badge-decision {
+    background-color: #198754;
+  }
+
+  .btn-action {
+    min-width: 110px;
+  }
+</style>
+
+<div class="container py-5">
+  <h2 class="text-center mb-5">
+    <i class="bi bi-calendar-week"></i> Toutes les Décisions & Actions
+  </h2>
+
+  <!-- Réunions -->
+  <div class="section-header">
+    <i class="bi bi-people-fill text-primary"></i> Actions
+  </div>
+  <div class="row g-4 mb-5">
+    {% for action in actions %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card p-3 event-card">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-1">
+            <a href="{% url 'afficher_action' action.id %}" class="text-decoration-none text-dark">{{ action.titre }}</a>
+          </h5>
+          <span class="badge badge-action text-white">Action</span>
+        </div>
+        <p class="mb-1"><strong>Description :</strong> {{ action.description }}</p>
+        <p class="mb-1"><strong>Deadline :</strong> {{ action.date_limite }}</p>
+        <p class="mb-1"><strong>Responsable :</strong><a href=" {% url 'afficher_profil' action.id_Utilisateur.id %}"> {{ action.id_Utilisateur.nom }}</a></p>
+        <p class="mb-1"><strong>Décision associée :</strong> 
+          <a href="{% url 'afficher_decision' action.id_decision.id %}">{{ action.id_decision.titre }}</a>
+        </p>
+        <div class="mt-3 d-flex justify-content-end gap-2">
+          <a href="#" class="btn mr-4 btn-sm btn-outline-primary btn-action">
+            <i class="bi bi-pencil-square "></i> Éditer
+          </a>
+          <a href="#" class="btn btn-sm btn-outline-danger btn-action" onclick="return confirm('Supprimer cette réunion ?')">
+            <i class="bi bi-trash"></i> Supprimer
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">Aucune Action enregistrée.</p>
+    {% endfor %}
+  </div>
+<!-- Your content -->
+<table class="table">
+  <!-- table content using actions -->
+
+<!-- Pagination -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    {% if actions.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1" aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ actions.previous_page_number }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+    {% endif %}
+
+    {% for num in actions.paginator.page_range %}
+      {% if actions.number == num %}
+        <li class="page-item active">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+      {% elif num > actions.number|add:'-3' and num < actions.number|add:'3' %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+
+    {% if actions.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ actions.next_page_number }}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ actions.paginator.num_pages }}" aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+  <!-- decisions -->
+  <div class="section-header">
+    <i class="bi bi-mortarboard-fill text-success"></i> Décisions
+  </div>
+  <div class="row g-4">
+    {% for decision in decisions %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card p-3 event-card border-success border-start">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-1">
+            <a href="{% url 'afficher' decision.id %}" class="text-decoration-none text-dark">{{ decision.titre }}</a>
+          </h5>
+          <span class="badge badge-decision text-white">decision</span>
+        </div>
+        <p class="mb-1"><strong>Description :</strong> {{ decision.description }}</p>
+        <p class="mb-1"><strong>Date prise:</strong> {{ decision.date_prise }}</p>
+        <p class="mb-1"><strong>Décideur :</strong><a href="{% url 'afficher_profil' decision.id_Utilisateur.id %}">{{ decision.id_Utilisateur.nom }}</a> </p>
+        <p class="mb-1"><strong>Réunion :</strong><a href="{% url 'afficher_reunion' decision.id_Reunion.id %}">{{ decision.id_Reunion.titre }}</a> </p>
+        <div class="mt-3 d-flex justify-content-end gap-2">
+          <a href="{% url 'editer' decision.id %}" class=" mr-4 btn btn-sm btn-outline-primary btn-action">
+            <i class="bi bi-pencil-square "></i> Éditer
+          </a>
+          <a href="{% url 'supprimer' decision.id %}" class="btn btn-sm btn-outline-danger btn-action" onclick="return confirm('Supprimer cette decision ?')">
+            <i class="bi bi-trash"></i> Supprimer
+          </a>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">Aucune decision enregistrée.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Your content -->
+
+
+<!-- Pagination -->
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    {% if decisions.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1" aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ decisions.previous_page_number }}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+    {% endif %}
+
+    {% for num in decisions.paginator.page_range %}
+      {% if decisions.number == num %}
+        <li class="page-item active">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+      {% elif num > decisions.number|add:'-3' and num < decisions.number|add:'3' %}
+        <li class="page-item">
+          <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+
+    {% if decisions.has_next %}
+      <li class="page-item">
+        <a class="page-link " href="?page={{ decisions.next_page_number }}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <li class="page-item">
+        <a class="page-link " href="?page={{ decisions.paginator.num_pages }}" aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+
+</div>
+
+{% endblock %}
+{% endblock %}

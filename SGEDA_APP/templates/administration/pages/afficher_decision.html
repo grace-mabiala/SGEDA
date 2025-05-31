@@ -1,0 +1,289 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  }
+
+  .decision-container {
+    max-width: 800px;
+    margin: 2rem auto;
+  }
+
+  .decision-card {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
+  }
+
+  .decision-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .card-header-gradient {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    padding: 1.5rem;
+    border-bottom: none;
+  }
+
+  .card-body-padding {
+    padding: 2rem;
+    background-color: white;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.5rem;
+  }
+
+  .detail-item {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .detail-label {
+    font-weight: 600;
+    color: #64748b;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .detail-value {
+    font-weight: 500;
+    color: var(--dark);
+    font-size: 1.05rem;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .badge-primary {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+  }
+
+  .badge-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .badge-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+
+  .btn-action {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-back {
+    background-color: var(--dark);
+    color: white;
+  }
+
+  .btn-back:hover {
+    background-color: #0f172a;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.2);
+  }
+
+  .btn-edit {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+  }
+
+  .btn-edit:hover {
+    background-color: rgba(99, 102, 241, 0.2);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .action-list {
+    margin-top: 1rem;
+  }
+
+  .action-item {
+    padding: 0.75rem;
+    border-radius: 8px;
+    background-color: #f8fafc;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+  }
+
+  .action-item:hover {
+    background-color: #f1f5f9;
+  }
+
+  @media (max-width: 768px) {
+    .detail-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    
+    .card-body-padding {
+      padding: 1.5rem;
+    }
+  }
+</style>
+
+<div class="container decision-container">
+  <div class="decision-card">
+    <div class="card-header-gradient d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-gavel fa-lg text-white me-3"></i>
+        <h4 class="mb-0 text-white">Détails de la décision</h4>
+      </div>
+      <a href="#" class="btn-action btn-edit">
+        <i class="fas fa-edit me-2"></i> Modifier
+      </a>
+    </div>
+
+    <div class="card-body-padding">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Titre</span>
+          <span class="detail-value">{{ decision.titre }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Description</span>
+          <span class="detail-value">{{ decision.description }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Date de prise</span>
+          <span class="detail-value">{{ decision.date_prise|date:"d/m/Y" }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Statut</span>
+          <span class="status-badge badge-{{ decision.get_status_class }}">
+            <i class="fas {{ decision.get_status_icon }} me-1"></i>
+            {{ decision.get_statut_display }}
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Décideur</span>
+          <span class="detail-value">
+            <a href="{% url 'afficher_profil' decision.id_Utilisateur.id %}" class="text-primary">
+              {{ decision.id_Utilisateur.nom }}
+            </a>
+          </span>
+        </div>
+
+        <div class="detail-item">
+          <span class="detail-label">Réunion associée</span>
+          <span class="detail-value">
+            <a href="{% url 'afficher_reunion' decision.id_Reunion.id %}" class="text-primary">
+              {{ decision.id_Reunion.titre }} ({{ decision.id_Reunion.date_de_debut|date:"d/m/Y" }})
+            </a>
+          </span>
+        </div>
+      </div>
+
+      <!-- Section Actions liées -->
+      <div class="mt-4">
+        <h5 class="mb-3">
+          <i class="fas fa-tasks me-2"></i>Actions associées
+          <span class="badge bg-secondary">{{ decision.actions.count }}</span>
+        </h5>
+        
+        {% if actions %}
+          <div class="action-list">
+            {% for action in actions %}
+              <div class="action-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <a href="{% url 'afficher_action' action.id %}" class="fw-bold text-dark">
+                      {{ action.titre }}
+                    </a>
+                    <div class="text-muted small mt-1">
+                      <span class="me-3">
+                        <i class="fas fa-user-tie me-1"></i>{{ action.id_Utilisateur.nom }}
+                      </span>
+                      <span>
+                        <i class="fas fa-clock me-1"></i>{{ action.date_limite|date:"d/m/Y" }}
+                      </span>
+                    </div>
+                  </div>
+                  <span class="badge bg-{{ action.get_status_class }}">
+                    {{ action.progression }}
+                  </span>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>Aucune action associée à cette décision
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="d-flex justify-content-between mt-5">
+        <a href="{% url 'suivre' %}" class="btn-action btn-back">
+          <i class="fas fa-arrow-left me-2"></i> Retour à la liste
+        </a>
+        
+        <div class="btn-group">
+          <a href="#" class="btn btn-outline-primary">
+            <i class="fas fa-file-pdf me-2"></i> Exporter PDF
+          </a>
+          <button class="btn btn-outline-secondary">
+            <i class="fas fa-share-alt me-2"></i> Partager
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Animation au chargement
+  document.addEventListener('DOMContentLoaded', () => {
+    const card = document.querySelector('.decision-card');
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+      card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 100);
+  });
+</script>
+
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,247 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --secondary: #10b981;
+    --warning: #f59e0b;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --card-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    min-height: 100vh;
+  }
+
+  .dashboard-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+
+  .dashboard-header h2 {
+    font-weight: 700;
+    color: var(--dark);
+    position: relative;
+    display: inline-block;
+  }
+
+  .dashboard-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 2px;
+  }
+
+  .dashboard-header p {
+    color: #64748b;
+    max-width: 700px;
+    margin: 1rem auto 0;
+  }
+
+  .option-card {
+    border: none;
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    height: 100%;
+    background: white;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .option-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+  }
+
+  .option-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--card-hover-shadow);
+  }
+
+  .option-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
+  .option-card:hover .option-icon {
+    transform: scale(1.1);
+  }
+
+  .option-card h5 {
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+
+  .option-card p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-option {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.6rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    background-color: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-option:hover {
+    background-color: rgba(99, 102, 241, 0.2);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+
+  .btn-option i {
+    margin-right: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .option-card {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+
+<div class="container py-5">
+  <div class="dashboard-header">
+    <h2>Tableau de Bord Administratif</h2>
+    <p>Accédez rapidement à toutes les fonctionnalités de gestion des réunions, formations et décisions</p>
+  </div>
+
+  <div class="row g-4">
+    <!-- Planifier une réunion -->
+    <div class="col-md-4 col-sm-6">
+      <div class="option-card">
+        <div class="option-icon">📅</div>
+        <h5>Planifier une réunion</h5>
+        <p>Créez et organisez de nouvelles réunions avec les participants</p>
+        <a href="{% url 'planifier_reunion'%}" class="btn btn-option">
+          <i class="fas fa-arrow-right"></i> Accéder
+        </a>
+      </div>
+    </div>
+
+    <!-- Planifier une formation -->
+    <div class="col-md-4 col-sm-6">
+      <div class="option-card">
+        <div class="option-icon">🎓</div>
+        <h5>Planifier une formation</h5>
+        <p>Organisez des sessions de formation pour vos collaborateurs</p>
+        <a href="{% url 'planifier_formation'%}" class="btn btn-option">
+          <i class="fas fa-arrow-right"></i> Accéder
+        </a>
+      </div>
+    </div>
+
+    <!-- Planifier une action -->
+    <div class="col-md-4 col-sm-6">
+      <div class="option-card">
+        <div class="option-icon">✅</div>
+        <h5>Planifier une action</h5>
+        <p>Créez et suivez les actions décidées en réunion</p>
+        <a href="{% url 'planifier_action' %}" class="btn btn-option">
+          <i class="fas fa-arrow-right"></i> Accéder
+        </a>
+      </div>
+    </div>
+
+    <!-- Prendre une décision -->
+    <div class="col-md-4 col-sm-6">
+      <div class="option-card">
+        <div class="option-icon">🧠</div>
+        <h5>Prendre une décision</h5>
+        <p>Enregistrez et documentez les décisions importantes</p>
+        <a href="{% url 'planifier_decision' %}" class="btn btn-option">
+          <i class="fas fa-arrow-right"></i> Accéder
+        </a>
+      </div>
+    </div>
+
+    <!-- Téléverser des supports de cours -->
+    <div class="col-md-4 col-sm-6">
+      <div class="option-card">
+        <div class="option-icon">📁</div>
+        <h5>Supports de cours</h5>
+        <p>Partagez les documents et supports de formation</p>
+        <a href="{% url 'televerserSupports' %}" class="btn btn-option">
+          <i class="fas fa-arrow-right"></i> Accéder
+        </a>
+      </div>
+    </div>
+
+    <!-- Rédiger un compte rendu -->
+    <div class="col-md-4 col-sm-6">
+      <div class="option-card">
+        <div class="option-icon">📝</div>
+        <h5>Compte rendu</h5>
+        <p>Rédigez et archivez les comptes rendus de réunion</p>
+        <a href="#" class="btn btn-option">
+          <i class="fas fa-arrow-right"></i> Accéder
+        </a>
+      </div>
+    </div>
+
+    <!-- Rédiger un procès-verbal -->
+    <div class="col-md-4 col-sm-6">
+      <div class="option-card">
+        <div class="option-icon">📜</div>
+        <h5>Procès-verbal</h5>
+        <p>Créez des PV officiels pour vos réunions importantes</p>
+        <a href="{% url 'rediger_pv' %}" class="btn btn-option">
+          <i class="fas fa-arrow-right"></i> Accéder
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Animation au chargement
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.option-card');
+    
+    cards.forEach((card, index) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      
+      setTimeout(() => {
+        card.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, 100);
+    });
+  });
+</script>
+
+{% endblock main %}
+{% endblock %}

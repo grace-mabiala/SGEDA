@@ -1,0 +1,107 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    h2 {
+      margin-top: 30px;
+    }
+    .table-container {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+
+    .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+  </style>
+
+
+  <div class="container py-5">
+  <a href="{% url 'reporting' %}">Reporting synthétique</a>
+  <a href="{% url 'afficher_actions_decisions' %}">Voir toutes décisions et actions</a>
+    <h2 class="text-center mb-5">Suivi des Décisions et Actions</h2>
+
+    <!-- Tableau des décisions -->
+    <div class="table-container">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Décisions prises</h4>
+        <a class="btn btn-primary" href="{% url 'planifier_decision' %}">Ajouter une décision</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Décision</th>
+              <th>Date</th>
+              <th>Responsable</th>
+              <th>Reunion associée</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for decision in decisions %}
+            <tr>
+              <td>{{decision.id}}</td>
+              <td><a href="{% url 'afficher_decision' decision.id %}">{{decision.titre}}</a></td>
+              <td>{{decision.date_prise}}</td>
+              <td><a href="{% url 'afficher_profil' decision.id_Utilisateur.id %}" class="mr-2">{{decision.id_Utilisateur}}</a> <img src="{{decision.id_Utilisateur.photo_de_profil.url}}" width="30" class="ms-2 avatar profile-picture" alt="" srcset=""></td>
+              <td><a href="{% url 'afficher_reunion' decision.id_Reunion.id %}">{{decision.id_Reunion.titre}}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+    </div>
+
+    <!-- Tableau des actions -->
+    <div class="table-container">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4>Actions assignées</h4>
+        <a class="btn btn-primary" href="{% url 'planifier_action' %}">Ajouter une action</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>#</th>
+              <th>Action</th>
+              <th>Responsable</th>
+              <th>Date limite</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            {% for action in actions %}
+            <tr>
+              <td>{{action.id}}</td>
+
+              <td ><a href="{% url 'afficher_action' action.id %}">{{action.titre}}</a></td>
+              <td><a href="{% url 'afficher_profil' action.id_Utilisateur.id %}" class="mr-2">{{action.id_Utilisateur}}</a> <img src="{{action.id_Utilisateur.photo_de_profil.url}}" width="30" class="ms-2 avatar profile-picture" alt="" srcset=""></td>
+              <td>{{action.date_limite}}</td>
+              <td><span class="badge bg-successn {% if action.progression == 'executé' %}badge-success
+                              {% elif action.progression == 'en attente' %}badge-warning
+                              {% else %}badge-info{% endif %}">{{action.progression}}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+    {% endblock %}
+    {% endblock %}
+

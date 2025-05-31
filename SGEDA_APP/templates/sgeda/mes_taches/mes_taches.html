@@ -1,0 +1,454 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Mes Tâches - SGEDA</title>
+{% endblock %}
+
+{% block body %}
+
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --success-color: #4cc9f0;
+        --warning-color: #f8961e;
+        --danger-color: #f72585;
+    }
+    
+    .tasks-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 60px 0 40px;
+        margin-bottom: 40px;
+    }
+    
+    .task-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+    
+    .task-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .task-priority {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-weight: 600;
+        padding: 3px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+    
+    .priority-high {
+        background-color: var(--danger-color);
+        color: white;
+    }
+    
+    .priority-medium {
+        background-color: var(--warning-color);
+        color: white;
+    }
+    
+    .priority-low {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .task-status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .status-pending {
+        background-color: #e9ecef;
+        color: #6c757d;
+    }
+    
+    .status-in-progress {
+        background-color: #bde0fe;
+        color: var(--primary-color);
+    }
+    
+    .status-completed {
+        background-color: #c7f9cc;
+        color: #2b9348;
+    }
+    
+    .status-late {
+        background-color: #ffddd2;
+        color: #e63946;
+    }
+    
+    .task-due-date {
+        font-size: 0.9rem;
+    }
+    
+    .task-due-date.late {
+        color: var(--danger-color);
+        font-weight: 500;
+    }
+    
+    .task-due-date.today {
+        color: var(--warning-color);
+        font-weight: 500;
+    }
+    
+    .task-due-date.future {
+        color: var(--success-color);
+    }
+    
+    .filter-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px 0;
+    }
+    
+    .empty-state-icon {
+        font-size: 5rem;
+        color: #e9ecef;
+        margin-bottom: 20px;
+    }
+    
+    .badge-filter {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .badge-filter:hover {
+        opacity: 0.8;
+    }
+    
+    .badge-filter.active {
+        background-color: var(--primary-color) !important;
+    }
+</style>
+{% include "sgeda/partials/header.html" %}
+<!-- Header -->
+<div class="tasks-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="fw-bold">Mes Tâches Assignées</h1>
+                <p class="lead mb-0">Consultez et gérez toutes les actions dont vous êtes responsable</p>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<!-- Content -->
+<div class="container mb-5">
+    <!-- Filters -->
+    <div class="filter-card">
+        <div class="row">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <label class="form-label">Statut</label>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-secondary badge-filter active" data-status="all">Tous</span>
+                    <span class="badge status-pending badge-filter" data-status="pending">En attente</span>
+                    <span class="badge status-in-progress badge-filter" data-status="in-progress">En cours</span>
+                    <span class="badge status-completed badge-filter" data-status="completed">Terminé</span>
+                    <span class="badge status-late badge-filter" data-status="late">En retard</span>
+                </div>
+            </div>
+           
+            <div class="col-md-4">
+                <label class="form-label">Échéance</label>
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-secondary badge-filter active" data-due="all">Toutes</span>
+                    <span class="badge bg-danger bg-opacity-10 text-danger badge-filter" data-due="today">Aujourd'hui</span>
+                    <span class="badge bg-warning bg-opacity-10 text-warning badge-filter" data-due="week">Cette semaine</span>
+                    <span class="badge bg-success bg-opacity-10 text-success badge-filter" data-due="future">Futures</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tasks List -->
+    <div class="row" id="tasksContainer">
+
+
+        {% for action in actions %}
+        <!-- Task 1 -->
+        <div class="col-md-6 col-lg-4 task-card" data-status="in-progress" data-priority="high" data-due="today">
+            <div class="card h-100">
+                <div class="card-body">
+                    <span class="task-priority priority-high">Haute Priorité</span>
+                    <h5 class="card-title">{{action.titre}}</h5>
+                    <p class="card-text text-muted">{{action.description|truncatechars:100}}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="task-status status-in-progress">{{action.progression}}</span>
+                        <span class="task-due-date today">Échéance: Aujourd'hui</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-project-diagram me-2 text-muted"></i>
+                            <small>Événement: Conférence annuelle</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Modifier</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-check me-2"></i>Marquer comme terminé</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-comment me-2"></i>Ajouter un commentaire</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>Supprimer</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- Task 2 -->
+        <div class="col-md-6 col-lg-4 task-card" data-status="pending" data-priority="medium" data-due="week">
+            <div class="card h-100">
+                <div class="card-body">
+                    <span class="task-priority priority-medium">Moyenne Priorité</span>
+                    <h5 class="card-title">Contacter les fournisseurs</h5>
+                    <p class="card-text text-muted">Prendre contact avec les 3 fournisseurs potentiels pour la logistique de l'événement.</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="task-status status-pending">En attente</span>
+                        <span class="task-due-date future">Échéance: 15/11/2023</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-project-diagram me-2 text-muted"></i>
+                            <small>Événement: Conférence annuelle</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Modifier</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-check me-2"></i>Marquer comme terminé</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-comment me-2"></i>Ajouter un commentaire</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>Supprimer</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Task 3 -->
+        <div class="col-md-6 col-lg-4 task-card" data-status="completed" data-priority="low" data-due="future">
+            <div class="card h-100">
+                <div class="card-body">
+                    <span class="task-priority priority-low">Basse Priorité</span>
+                    <h5 class="card-title">Envoyer les invitations</h5>
+                    <p class="card-text text-muted">Envoyer les invitations par email aux participants confirmés pour l'atelier du 20 novembre.</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="task-status status-completed">Terminé</span>
+                        <span class="task-due-date future">Échéance: 10/11/2023</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-project-diagram me-2 text-muted"></i>
+                            <small>Événement: Atelier formation</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Modifier</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-undo me-2"></i>Réouvrir</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-comment me-2"></i>Ajouter un commentaire</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>Supprimer</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Task 4 -->
+        <div class="col-md-6 col-lg-4 task-card" data-status="late" data-priority="high" data-due="week">
+            <div class="card h-100">
+                <div class="card-body">
+                    <span class="task-priority priority-high">Haute Priorité</span>
+                    <h5 class="card-title">Valider la liste des intervenants</h5>
+                    <p class="card-text text-muted">Finaliser et valider la liste des intervenants pour la conférence avec le comité.</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="task-status status-late">En retard</span>
+                        <span class="task-due-date late">Échéance: 05/11/2023</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-project-diagram me-2 text-muted"></i>
+                            <small>Événement: Conférence annuelle</small>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-edit me-2"></i>Modifier</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-check me-2"></i>Marquer comme terminé</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="fas fa-comment me-2"></i>Ajouter un commentaire</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>Supprimer</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Empty State (hidden by default) -->
+    <div class="empty-state d-none" id="emptyState">
+        <div class="empty-state-icon">
+            <i class="fas fa-tasks"></i>
+        </div>
+        <h4>Aucune tâche trouvée</h4>
+        <p class="text-muted">Aucune tâche ne correspond à vos critères de filtrage.</p>
+        <a href="#" class="btn btn-primary" id="resetFilters">
+            <i class="fas fa-sync me-2"></i>Réinitialiser les filtres
+        </a>
+    </div>
+    
+    <!-- Pagination -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item disabled">
+                <a class="page-link" href="#">Précédent</a>
+            </li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item">
+                <a class="page-link" href="#">Suivant</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Footer -->
+{% include "sgeda/partials/footer.html" %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterBadges = document.querySelectorAll('.badge-filter');
+        const tasksContainer = document.getElementById('tasksContainer');
+        const emptyState = document.getElementById('emptyState');
+        const resetFiltersBtn = document.getElementById('resetFilters');
+        
+        // Variables pour stocker les filtres actifs
+        let activeFilters = {
+            status: 'all',
+            priority: 'all',
+            due: 'all'
+        };
+        
+        // Gestion des clics sur les badges de filtre
+        filterBadges.forEach(badge => {
+            badge.addEventListener('click', function() {
+                const filterType = this.hasAttribute('data-status') ? 'status' : 
+                                  this.hasAttribute('data-priority') ? 'priority' : 'due';
+                const filterValue = this.getAttribute(`data-${filterType}`);
+                
+                // Mettre à jour le filtre actif
+                activeFilters[filterType] = filterValue;
+                
+                // Mettre à jour l'apparence des badges
+                document.querySelectorAll(`.badge-filter[data-${filterType}]`).forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Appliquer les filtres
+                applyFilters();
+            });
+        });
+        
+        // Fonction pour appliquer les filtres
+        function applyFilters() {
+            let visibleTasks = 0;
+            const taskCards = document.querySelectorAll('.task-card');
+            
+            taskCards.forEach(card => {
+                const matchesStatus = activeFilters.status === 'all' || 
+                                     card.getAttribute('data-status') === activeFilters.status;
+                const matchesPriority = activeFilters.priority === 'all' || 
+                                       card.getAttribute('data-priority') === activeFilters.priority;
+                const matchesDue = activeFilters.due === 'all' || 
+                                  card.getAttribute('data-due') === activeFilters.due;
+                
+                if (matchesStatus && matchesPriority && matchesDue) {
+                    card.style.display = 'block';
+                    visibleTasks++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Afficher ou masquer l'empty state
+            if (visibleTasks === 0) {
+                tasksContainer.classList.add('d-none');
+                emptyState.classList.remove('d-none');
+            } else {
+                tasksContainer.classList.remove('d-none');
+                emptyState.classList.add('d-none');
+            }
+        }
+        
+        // Réinitialiser les filtres
+        resetFiltersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Réinitialiser les filtres actifs
+            activeFilters = {
+                status: 'all',
+                priority: 'all',
+                due: 'all'
+            };
+            
+            // Réinitialiser l'apparence des badges
+            document.querySelectorAll('.badge-filter').forEach(badge => {
+                badge.classList.remove('active');
+                if (badge.getAttribute('data-status') === 'all' || 
+                    badge.getAttribute('data-priority') === 'all' || 
+                    badge.getAttribute('data-due') === 'all') {
+                    badge.classList.add('active');
+                }
+            });
+            
+            // Réappliquer les filtres (tout afficher)
+            applyFilters();
+        });
+    });
+</script>
+{% endblock %}

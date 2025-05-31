@@ -1,0 +1,285 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+{% block content %}
+
+<style>
+  :root {
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --text-dark: #1e293b;
+    --text-light: #64748b;
+    --light-bg: #f8fafc;
+    --card-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+  }
+
+  .profile-container {
+    perspective: 1000px;
+  }
+
+  .profile-card {
+    max-width: 600px;
+    margin: 80px auto;
+    padding: 40px;
+    border-radius: 24px;
+    background: white;
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+    transform-style: preserve-3d;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, var(--primary-color), #8b5cf6);
+  }
+
+  .profile-card:hover {
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  .profile-pic-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 25px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+    padding: 4px;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+  }
+
+  .profile-pic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid white;
+    transition: all 0.3s ease;
+  }
+
+  .profile-pic-container:hover .profile-pic {
+    transform: scale(1.05);
+  }
+
+  .profile-name {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+    position: relative;
+    display: inline-block;
+  }
+
+  .profile-name::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: var(--primary-color);
+    border-radius: 3px;
+  }
+
+  .profile-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+  }
+
+  .info-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    background: var(--light-bg);
+  }
+
+  .info-item:hover {
+    background: rgba(99, 102, 241, 0.05);
+    transform: translateX(5px);
+  }
+
+  .info-icon {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    margin-right: 15px;
+    min-width: 24px;
+  }
+
+  .info-content {
+    flex: 1;
+  }
+
+  .info-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-light);
+    margin-bottom: 2px;
+  }
+
+  .info-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-dark);
+  }
+
+  .btn-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 28px;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: 12px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
+    transition: all 0.3s ease;
+    margin-top: 30px;
+  }
+
+  .btn-edit:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px rgba(99, 102, 241, 0.3);
+    color: white;
+  }
+
+  .btn-edit i {
+    margin-right: 8px;
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 576px) {
+    .profile-card {
+      padding: 30px 20px;
+      margin: 40px auto;
+    }
+    
+    .profile-info {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="container profile-container">
+  <div class="profile-card">
+    <div class="text-center">
+      <div class="profile-pic-container">
+        <a href="{{ request.user.photo_de_profil.url }}">
+          <img src="{{ request.user.photo_de_profil.url }}" alt="Photo de profil" class="profile-pic">
+        </a>
+      </div>
+      <h2 class="profile-name">{{ request.user.prenom }} {{ request.user.nom }}</h2>
+    </div>
+
+    <div class="profile-info">
+      <div class="info-item">
+        <i class="bi bi-person info-icon"></i>
+        <div class="info-content">
+          <span class="info-label">Nom</span>
+          <span class="info-value">{{ request.user.nom }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="bi bi-person info-icon"></i>
+        <div class="info-content">
+          <span class="info-label">Prénom</span>
+          <span class="info-value">{{ request.user.prenom }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="bi bi-envelope info-icon"></i>
+        <div class="info-content">
+          <span class="info-label">Email</span>
+          <span class="info-value">{{ request.user.email }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="bi bi-diagram-3 info-icon"></i>
+        <div class="info-content">
+          <span class="info-label">Département</span>
+          <span class="info-value">{{ request.user.departement }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="bi bi-person-badge info-icon"></i>
+        <div class="info-content">
+          <span class="info-label">Rôle</span>
+          <span class="info-value">{{ request.user.role }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="bi bi-briefcase info-icon"></i>
+        <div class="info-content">
+          <span class="info-label">Fonction</span>
+          <span class="info-value">{{ request.user.fonction }}</span>
+        </div>
+      </div>
+
+      <div class="info-item">
+        <i class="bi bi-lock info-icon"></i>
+        <div class="info-content">
+          <span class="info-label">Mot de passe</span>
+          <span class="info-value">••••••••</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <a href="{% url 'editer_profil' %}" class="btn btn-edit">
+        <i class="bi bi-pencil-square"></i> Modifier mon profil
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Animation au chargement de la page
+  document.addEventListener('DOMContentLoaded', () => {
+    const card = document.querySelector('.profile-card');
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px) rotateX(10deg)';
+    
+    setTimeout(() => {
+      card.style.transition = 'opacity 0.6s ease, transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0) rotateX(0)';
+    }, 100);
+  });
+
+  // Effet de parallaxe léger
+  document.addEventListener('mousemove', (e) => {
+    const card = document.querySelector('.profile-card');
+    const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+    const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+    card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+  });
+</script>
+
+{% endblock %}

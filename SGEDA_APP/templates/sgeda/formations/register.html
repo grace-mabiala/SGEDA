@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Inscription Formation - SGEDA</title>
+{% endblock %}
+
+{% block body %}
+{% include "sgeda/partials/header.html" %}
+
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --success-color: #4cc9f0;
+    }
+    
+    .formation-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+    }
+    
+    .formation-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+    }
+    
+    .formation-details {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        padding: 25px;
+    }
+    
+    .badge-formation {
+        padding: 6px 12px;
+        font-weight: 500;
+        border-radius: 20px;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+    }
+    
+    .btn-primary {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    
+    .btn-primary:hover {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+    }
+    
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    
+    .step {
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .step-number {
+        width: 40px;
+        height: 40px;
+        background-color: #e9ecef;
+        color: #6c757d;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-weight: bold;
+    }
+    
+    .step.active .step-number {
+        background-color: var(--primary-color);
+        color: white;
+    }
+    
+    .step.completed .step-number {
+        background-color: var(--success-color);
+        color: white;
+    }
+    
+    .step-title {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+    
+    .step.active .step-title {
+        color: var(--primary-color);
+        font-weight: 500;
+    }
+    
+    .step-indicator::before {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #e9ecef;
+        z-index: 0;
+    }
+    
+    .progress-bar {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        height: 2px;
+        background-color: var(--primary-color);
+        z-index: 1;
+        transition: width 0.3s ease;
+    }
+</style>
+
+<!-- Formation Header -->
+<div class="formation-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="fw-bold">Inscription à la formation</h1>
+                <p class="lead mb-0">Complétez les informations requises pour votre inscription</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{% url 'formations' %}" class="btn btn-light">
+                    <i class="fas fa-arrow-left me-2"></i>Retour aux formations
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Content -->
+<div class="container mb-5">
+    <div class="row">
+        <!-- Formation Summary -->
+        <div class="col-lg-4 mb-4 mb-lg-0">
+            <div class="formation-card card">
+                <img src="https://images.unsplash.com/photo-1524179091875-bf99a9a6af57" class="card-img-top" alt="Image formation">
+                <div class="card-body">
+                    <h3 class="card-title">Gestion d'événements - Niveau 1</h3>
+                    <p class="text-muted">Formation de base couvrant les principes fondamentaux de la gestion d'événements.</p>
+                    
+                    <div class="mb-3">
+                        <h5 class="fw-bold">Détails de la session</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="fas fa-calendar-alt me-2 text-primary"></i> 15-17 novembre 2023</li>
+                            <li class="mb-2"><i class="fas fa-clock me-2 text-primary"></i> 09:00 - 17:00</li>
+                            <li class="mb-2"><i class="fas fa-map-marker-alt me-2 text-primary"></i> Centre de formation SGEDA, Paris</li>
+                            <li class="mb-2"><i class="fas fa-user-tie me-2 text-primary"></i> Formateur: Jean Dupont</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge bg-primary bg-opacity-10 text-primary badge-formation">
+                            <i class="fas fa-clock me-1"></i> 3 jours
+                        </span>
+                        <span class="badge bg-success bg-opacity-10 text-success badge-formation">
+                            <i class="fas fa-certificate me-1"></i> Certification
+                        </span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 text-primary">450€</h4>
+                        <span class="text-muted small">HT (540€ TTC)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-info-circle me-2 text-primary"></i>Informations importantes</h5>
+                    <ul class="small text-muted">
+                        <li class="mb-2">Paiement sécurisé par carte bancaire</li>
+                        <li class="mb-2">Facture disponible dans votre espace personnel</li>
+                        <li class="mb-2">Annulation possible jusqu'à 7 jours avant</li>
+                        <li class="mb-2">Matériel pédagogique inclus</li>
+                        <li>Déjeuners offerts pour les formations en présentiel</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Inscription Form -->
+        <div class="col-lg-8">
+            <div class="formation-details">
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active" id="step1">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Informations</div>
+                    </div>
+                    <div class="step" id="step2">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Paiement</div>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Confirmation</div>
+                    </div>
+                    <div class="progress-bar" style="width: 33%;"></div>
+                </div>
+                
+                <h3 class="mb-4">Vos informations personnelles</h3>
+                
+                <form id="inscriptionForm">
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="prenom" class="form-label">Prénom *</label>
+                            <input type="text" class="form-control" id="prenom" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="nom" class="form-label">Nom *</label>
+                            <input type="text" class="form-control" id="nom" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="telephone" class="form-label">Téléphone *</label>
+                            <input type="tel" class="form-control" id="telephone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="entreprise" class="form-label">Entreprise / Organisation</label>
+                        <input type="text" class="form-control" id="entreprise">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="fonction" class="form-label">Fonction</label>
+                        <input type="text" class="form-control" id="fonction">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Besoin spécifique ?</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="handicap">
+                            <label class="form-check-label" for="handicap">
+                                Situation de handicap (nous contacter pour adaptation)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="regime">
+                            <label class="form-check-label" for="regime">
+                                Régime alimentaire spécifique
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="commentaires" class="form-label">Commentaires ou questions</label>
+                        <textarea class="form-control" id="commentaires" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="cgv" required>
+                            <label class="form-check-label" for="cgv">
+                                J'accepte les <a href="#" class="text-primary">conditions générales de vente</a> *
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'formations' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Annuler
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            Continuer vers le paiement <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+{% include "sgeda/partials/footer.html" %}
+
+<script>
+    // Script pour gérer les étapes du formulaire
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('inscriptionForm');
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Simulation de la progression
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('active');
+            document.querySelector('.progress-bar').style.width = '66%';
+            
+            // Ici vous pourriez ajouter la logique pour passer à l'étape de paiement
+            // Pour l'exemple, nous affichons simplement un message
+            alert('Redirection vers le module de paiement...');
+        });
+    });
+</script>
+{% endblock %}

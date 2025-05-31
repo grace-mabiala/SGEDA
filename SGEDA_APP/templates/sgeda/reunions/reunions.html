@@ -1,0 +1,464 @@
+
+{% extends 'base.html' %}
+
+
+    {% block title %}
+    <title>SGEDA - Système de Gestion des Événements, Décisions et Actions</title>
+    <!-- Bootstrap 5 CSS -->
+    {% endblock %}
+
+
+{% block body %}
+
+
+     
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 0 40px;
+            margin-bottom: 40px;
+        }
+        
+        .meeting-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+            margin-bottom: 25px;
+        }
+        
+        .meeting-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .meeting-date {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .meeting-type {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .meeting-img {
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .participant-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+            margin-left: -10px;
+        }
+        
+        .participant-avatar:first-child {
+            margin-left: 0;
+        }
+        
+        .filter-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .badge-pill {
+            padding: 6px 12px;
+            font-weight: 500;
+        }
+    </style>
+
+ {% include "sgeda/partials/header.html" %}
+    <!-- Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="fw-bold">Réunions</h1>
+                    <p class="lead mb-0">Consultez l'historique et les prochaines réunions</p>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="container mb-5">
+        <!-- Filters -->
+        <div class="filter-card">
+        <form   id="formationFilterForm" action="">
+            <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <label class="form-label">Type de réunion</label>
+                    <select class="form-select" name="type">
+                        <option >Tous les types</option>
+                        <option value="Comité">Comité</option>
+                        <option value="Projet">Projet</option>
+                        <option value="Interne"  >Interne</option>
+                    </select>
+                </div>
+                
+            </div>
+        </div>
+
+        </form>
+        
+        <!-- Meetings List -->
+        <div id="formationsContainer" class="row">
+            <!-- Meeting 1 -->
+
+            {% for reunion in reunions %}
+            <div class="col-md-6 col-lg-4">
+                <div class="meeting-card card">
+                    <img src="{{reunion.image}}" class="meeting-img card-img-top">
+                    <div class="meeting-date">{{reunion.date_de_debut}}</div>
+                    <div class="meeting-type">{{reunion.type}}</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{reunion.titre}}</h5>
+                        <p class="card-text text-muted">Salle: {{reunion.salle.nom }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex">
+                                <img src="#" class="participant-avatar">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="participant-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/22.jpg" class="participant-avatar">
+                                <span class="participant-avatar bg-primary text-white d-flex align-items-center justify-content-center">
+                                    +5
+                                </span>
+                            </div>
+                            <span class="badge bg-primary bg-opacity-10 text-primary badge-pill">
+                                <i class="fas fa-clock me-1"></i> 09:00
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <a href="{% url 'detail_reunion_frt' reunion.id %}" class="btn btn-sm btn-outline-primary w-100">
+                            Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <!-- Meeting 2 -->
+            <!-- <div class="col-md-6 col-lg-4">
+                <div class="meeting-card card">
+                    <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d" class="meeting-img card-img-top">
+                    <div class="meeting-date">20 Juin</div>
+                    <div class="meeting-type">Projet</div>
+                    <div class="card-body">
+                        <h5 class="card-title">Revue de projet X</h5>
+                        <p class="card-text text-muted">Point d'avancement sur le projet X et ajustements nécessaires.</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex">
+                                <img src="https://randomuser.me/api/portraits/women/68.jpg" class="participant-avatar">
+                                <img src="https://randomuser.me/api/portraits/men/75.jpg" class="participant-avatar">
+                                <span class="participant-avatar bg-primary text-white d-flex align-items-center justify-content-center">
+                                    +3
+                                </span>
+                            </div>
+                            <span class="badge bg-primary bg-opacity-10 text-primary badge-pill">
+                                <i class="fas fa-clock me-1"></i> 14:00
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0">
+                        <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                            Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div> -->
+            
+            <!-- More meetings... -->
+        </div>
+        
+        <!-- Pagination -->
+
+<!-- Pagination links -->
+<<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">  <!-- 'justify-content-center' centers the pagination -->
+    <!-- First & Previous Links -->
+    {% if reunions.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page=1" aria-label="First">&laquo;</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ reunions.previous_page_number }}" aria-label="Previous">Prev</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&laquo;</span>  <!-- Disabled state -->
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link">Prev</span>
+      </li>
+    {% endif %}
+
+    <!-- Current Page Info -->
+    <li class="page-item active">
+      <span class="page-link">
+        {{ reunions.number }} / {{ reunions.paginator.num_pages }}
+      </span>
+    </li>
+
+    <!-- Next & Last Links -->
+    {% if reunions.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ reunions.next_page_number }}" aria-label="Next">Next</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="?page={{ reunions.paginator.num_pages }}" aria-label="Last">&raquo;</a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">Next</span>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link">&raquo;</span>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+
+    <!-- Footer -->
+   {% include "sgeda/partials/footer.html" %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formationFilterForm');
+    const formationsContainer = document.getElementById('formationsContainer');
+    
+    // Création de l'indicateur de chargement
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.className = 'col-12 text-center my-5';
+    loadingIndicator.innerHTML = `
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+        </div>
+        <p class="mt-2">Recherche en cours...</p>
+    `;
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Afficher l'indicateur de chargement
+        formationsContainer.innerHTML = '';
+        formationsContainer.appendChild(loadingIndicator);
+        
+        // Récupérer les données du formulaire
+        const formData = {
+            type: form.elements.type.value,
+            
+        };
+        
+        // URL de l'API (adaptez-la à votre configuration)
+        const apiUrl = 'http://localhost:8000/api/reunions/search/';
+        
+        // Envoyer la requête POST
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => Promise.reject(err));
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Effacer le contenu actuel
+            formationsContainer.innerHTML = '';
+            
+            if (data.length === 0) {
+                // Afficher un message si aucun résultat
+                const noResults = document.createElement('div');
+                noResults.className = 'col-12 text-center py-5';
+                noResults.innerHTML = '<p class="text-muted">Aucune réunion ne correspond à vos critères de recherche.</p>';
+                formationsContainer.appendChild(noResults);
+                return;
+            }
+            
+            // Générer les nouvelles cartes de réunion
+            data.forEach(reunion => {
+                const reunionCard = createReunionCard(reunion);
+                formationsContainer.appendChild(reunionCard);
+            });
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
+            formationsContainer.innerHTML = `
+                <div class="col-12 alert alert-danger">
+                    Erreur lors de la recherche : ${error.message || 'Erreur serveur'}
+                </div>
+            `;
+        });
+    });
+
+    // Fonction pour créer une carte de réunion
+    function createReunionCard(reunion) {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-md-6 col-lg-4 mb-4';
+        
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'meeting-card card h-100';
+        
+        // Image de la réunion
+        const img = document.createElement('img');
+
+            if (reunion.image) {
+        let imageUrl = reunion.image;
+        
+        // Correction pour les URLs mal formatées
+        if (imageUrl.includes('%3A')) {
+            imageUrl = decodeURIComponent(imageUrl);
+        }
+        
+        // Suppression du préfixe localhost si présent
+            if (imageUrl.startsWith('http://localhost:8000/http')) {
+                imageUrl = imageUrl.replace('http://localhost:8000/', '');
+            }
+        
+            img.src = imageUrl;
+            }
+       
+        img.className = 'meeting-img card-img-top';
+        img.alt = reunion.titre;
+        
+        // Date de la réunion
+        const dateDiv = document.createElement('div');
+        dateDiv.className = 'meeting-date';
+        dateDiv.textContent = formatDate(reunion.date_de_debut);
+        
+        // Type de réunion
+        const typeDiv = document.createElement('div');
+        typeDiv.className = 'meeting-type';
+        typeDiv.textContent = reunion.type;
+        
+        // Corps de la carte
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body';
+        
+        // Titre
+        const titleH5 = document.createElement('h5');
+        titleH5.className = 'card-title';
+        titleH5.textContent = reunion.titre;
+        
+        // Salle
+        const salleP = document.createElement('p');
+        salleP.className = 'card-text text-muted';
+        salleP.textContent = `Salle: ${reunion.salle || 'Non spécifiée'}`;
+        
+        // Participants
+        const participantsDiv = document.createElement('div');
+        participantsDiv.className = 'd-flex justify-content-between align-items-center mb-3';
+        
+        const avatarsDiv = document.createElement('div');
+        avatarsDiv.className = 'd-flex';
+        
+        // Exemple d'avatars (à adapter selon vos données)
+        const avatar1 = document.createElement('img');
+        avatar1.src = 'https://randomuser.me/api/portraits/men/32.jpg';
+        avatar1.className = 'participant-avatar';
+        
+        const avatar2 = document.createElement('img');
+        avatar2.src = 'https://randomuser.me/api/portraits/women/44.jpg';
+        avatar2.className = 'participant-avatar';
+        
+        const avatarCount = document.createElement('span');
+        avatarCount.className = 'participant-avatar bg-primary text-white d-flex align-items-center justify-content-center';
+        avatarCount.textContent = '+3';
+        
+        avatarsDiv.appendChild(avatar1);
+        avatarsDiv.appendChild(avatar2);
+        avatarsDiv.appendChild(avatarCount);
+        
+        // Heure
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'badge bg-primary bg-opacity-10 text-primary badge-pill';
+        timeSpan.innerHTML = `<i class="fas fa-clock me-1"></i> ${reunion.heure || '--:--'}`;
+        
+        participantsDiv.appendChild(avatarsDiv);
+        participantsDiv.appendChild(timeSpan);
+        
+        // Pied de carte
+        const cardFooter = document.createElement('div');
+        cardFooter.className = 'card-footer bg-white border-top-0';
+        
+        const detailsBtn = document.createElement('a');
+        detailsBtn.href = `/reunions/${reunion.id}`;
+        detailsBtn.className = 'btn btn-sm btn-outline-primary w-100';
+        detailsBtn.textContent = 'Voir les détails';
+        
+        // Assemblage de la carte
+        cardBody.appendChild(titleH5);
+        cardBody.appendChild(salleP);
+        cardBody.appendChild(participantsDiv);
+        
+        cardFooter.appendChild(detailsBtn);
+        
+        cardDiv.appendChild(img);
+        cardDiv.appendChild(dateDiv);
+        cardDiv.appendChild(typeDiv);
+        cardDiv.appendChild(cardBody);
+        cardDiv.appendChild(cardFooter);
+        
+        colDiv.appendChild(cardDiv);
+        
+        return colDiv;
+    }
+    
+    // Fonction utilitaire pour formater la date
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+    }
+    
+    // Optionnel : Ajouter un délai pour éviter les requêtes trop fréquentes
+    let searchTimeout;
+    const searchInputs = form.querySelectorAll('select');
+    searchInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => form.dispatchEvent(new Event('submit')), 500);
+        });
+    });
+});
+</script>
+
+{% endblock %}

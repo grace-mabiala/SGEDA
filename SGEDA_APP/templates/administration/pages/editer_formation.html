@@ -1,0 +1,165 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<div class="container-fluid px-4 py-3">
+    <!-- Notifications -->
+    {% if messages %}
+    <div class="mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Card Container -->
+    <div class="card border-0 shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                <i class="bi bi-pencil-square me-2"></i>Éditer une formation
+            </h4>
+        </div>
+        
+        <div class="card-body">
+            <form method="post" action="{% url 'editer' formation.id %}" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="id" value="{{ formation.id }}">
+                <input type="hidden" name="utilisateur" value="{{ formation.id_Utilisateur }}">
+
+                <!-- Form Grid -->
+                <div class="row g-3">
+                    <!-- Left Column -->
+                    <div class="col-md-6">
+                        <!-- Intitulé -->
+                        <div class="mb-3">
+                            <label for="intitule" class="form-label">Intitulé*</label>
+                            <input type="text" class="form-control" id="intitule" name="intitule" 
+                                   value="{{ formation.intitule }}" required>
+                            <div class="invalid-feedback">Veuillez saisir un intitulé.</div>
+                        </div>
+
+                        <!-- Objectif -->
+                        <div class="mb-3">
+                            <label for="objectif" class="form-label">Objectif*</label>
+                            <input type="text" class="form-control" id="objectif" name="objectif" 
+                                   value="{{ formation.objectif }}" required>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-3">
+                                <label for="debut" class="form-label">Date de début*</label>
+                                <input type="datetime-local" class="form-control" id="debut" name="debut" 
+                                       value="{{ formation.date_de_debut|date:'Y-m-d\TH:i' }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="fin" class="form-label">Date de fin*</label>
+                                <input type="datetime-local" class="form-control" id="fin" name="fin" 
+                                       value="{{ formation.date_de_fin|date:'Y-m-d\TH:i' }}" required>
+                            </div>
+                        </div>
+
+                        <!-- Durée -->
+                        <div class="mb-3">
+                            <label for="duree" class="form-label">Durée*</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="duree" name="duree" 
+                                       value="{{ formation.duree }}" required>
+                                <span class="input-group-text">heures</span>
+                            </div>
+                        </div>
+
+                        <!-- Modalité & Statut -->
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-3">
+                                <label for="modalite" class="form-label">Modalité*</label>
+                                <select class="form-select" id="modalite" name="modalite" required>
+                                    {% for code, name in STATUT_CHOICES %}
+                                    <option value="{{ code }}" {% if code == formation.modalite %}selected{% endif %}>
+                                        {{ name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="statut" class="form-label">Statut*</label>
+                                <select class="form-select" id="statut" name="statut" required>
+                                    {% for code, name in STATUT_CHOICES1 %}
+                                    <option value="{{ code }}" {% if code == formation.statut %}selected{% endif %}>
+                                        {{ name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Public Cible -->
+                        <div class="mb-3">
+                            <label for="public_cible" class="form-label">Public cible*</label>
+                            <input type="text" class="form-control" id="public_cible" name="public_cible" 
+                                   value="{{ formation.public_cible }}" required>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div class="col-md-6">
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description*</label>
+                            <textarea class="form-control" id="description" name="description" 
+                                      rows="4" required>{{ formation.description }}</textarea>
+                        </div>
+
+                        <!-- Prérequis -->
+                        <div class="mb-3">
+                            <label for="prerequis" class="form-label">Prérequis</label>
+                            <textarea class="form-control" id="prerequis" name="prerequis" 
+                                      rows="4">{{ formation.prerequis }}</textarea>
+                        </div>
+
+                        <!-- Programme -->
+                        <div class="mb-3">
+                            <label for="programme" class="form-label">Programme</label>
+                            <textarea class="form-control" id="programme" name="programme" 
+                                      rows="4">{{ formation.programme }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="bi bi-check-circle me-2"></i>Enregistrer les modifications
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock main %}
+{% endblock content %}
+
+{% block scripts %}
+<script>
+// Example of client-side validation
+(function () {
+    'use strict'
+    const forms = document.querySelectorAll('.needs-validation')
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+{% endblock %}

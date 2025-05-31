@@ -1,0 +1,344 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --info: #0ea5e9;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    background-color: #f1f5f9;
+  }
+
+  .decision-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+
+  .card-header-custom {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .card-title-custom {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0;
+  }
+
+  .badge-title {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-weight: 500;
+  }
+
+  .table-container {
+    overflow-x: auto;
+    border-radius: 0 0 12px 12px;
+  }
+
+  .decision-table {
+    width: 100%;
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .decision-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    color: var(--dark);
+    font-weight: 600;
+    padding: 1rem;
+    border-bottom: 2px solid #e2e8f0;
+    white-space: nowrap;
+  }
+
+  .decision-table tbody td {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+  }
+
+  .decision-table tbody tr:hover {
+    background-color: #f8fafc;
+  }
+
+  .action-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .action-link {
+    color: var(--dark);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+  }
+
+  .action-link:hover {
+    color: var(--primary);
+  }
+
+  .action-icon {
+    color: var(--success);
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+  }
+
+  .progress-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 1rem;
+  }
+
+  .badge-info {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: var(--info);
+  }
+
+  .badge-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+  }
+  .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+  .badge-success {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+  }
+
+  .pagination-custom {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  .page-item {
+    margin: 0 0.25rem;
+  }
+
+  .page-link {
+    border: none;
+    border-radius: 8px !important;
+    color: var(--dark);
+    padding: 0.5rem 0.9rem;
+    transition: all 0.2s ease;
+  }
+
+  .page-link:hover {
+    background-color: #e2e8f0;
+    color: var(--primary);
+  }
+
+  .page-item.active .page-link {
+    background-color: var(--primary);
+    color: white;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .card-header-custom {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .decision-table thead th,
+    .decision-table tbody td {
+      padding: 0.75rem;
+    }
+  }
+</style>
+
+<div class="container-fluid">
+  <div class="decision-card">
+    <div class="card-header-custom d-flex justify-content-between align-items-center">
+      <div class="card-title-custom">
+        <i class="fas fa-clipboard-list me-3"></i>
+        <h4 class="mb-0"><span class="badge-title">Liste des décisions</span></h4>
+      </div>
+      <button id="btn" type="button" class="btn btn-sm btn-light" data-card-widget="collapse">
+        <i class="fas fa-minus"></i>
+      </button>
+    </div>
+
+    <div class="table-container">
+      <table class="decision-table">
+        <thead>
+          <tr>
+            <th>Titre Décision</th>
+            <th>Date prise</th>
+            <th>Décideur</th>
+            <th>Réunion associée</th>
+            <th>Type de réunion</th>
+            <th>Organisateur</th>
+            <th>Actions et avancement</th>
+            <th>Assignateur</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if decisions %}
+            {% for decision in decisions %}
+            <tr>
+              <td>{{ decision.titre|title }}</td>
+              <td>{{ decision.date_prise|date:"d/m/Y" }}</td>
+              <td>
+                <a href="{% url 'afficher_profil' decision.id_Utilisateur.id %}" class="text-primary">
+                  {{ decision.id_Utilisateur.nom|title }}
+                </a>
+              </td>
+              <td>
+                <a href="{% url 'afficher_reunion' decision.id_Reunion.id %}" class="text-primary">
+                  {{ decision.id_Reunion.titre }}
+                </a>
+              </td>
+              <td>{{ decision.id_Reunion.type }}</td>
+              <td>
+                <a href="{% url 'afficher_profil' decision.id_Utilisateur.id %}" class="text-primary">
+                  {{ decision.id_Utilisateur.nom|title }}
+                </a>
+              </td>
+              <td>
+                {% with actions|dictsort:"id" as sorted_actions %}
+                  {% if actions %}
+                    <div class="action-list">
+                      {% for action in actions %}
+                        {% if action.id_decision.id == decision.id %}
+                          <div class="action-item">
+                            <a href="{% url 'afficher_action' action.id %}" class="action-link">
+                              <i class="bi bi-pencil-square action-icon"></i>
+                              <span>{{ action.titre }}</span>
+                            </a>
+                            <span class="progress-badge 
+                              {% if action.progression == 'Terminé' %}badge-success
+                              {% elif action.progression == 'En cours' %}badge-warning
+                              {% else %}badge-info{% endif %}">
+                              {{ action.progression|title }}
+                            </span>
+                          </div>
+                        {% endif %}
+                      {% empty %}
+                        <span class="text-muted">Aucune action</span>
+                      {% endfor %}
+                    </div>
+                  {% else %}
+                    <span class="text-muted">Aucune action</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td>
+                <a href="{% url 'afficher_profil' request.user.id %}" class="text-primary">
+                  {{ request.user.nom|title }}
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" class="empty-state">
+                <i class="fas fa-inbox fa-2x mb-3"></i>
+                <p>Aucune décision disponible</p>
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if decisions.paginator.num_pages > 1 %}
+    <div class="pagination-custom">
+      <ul class="pagination">
+        {% if decisions.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1" aria-label="First">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ decisions.previous_page_number }}" aria-label="Previous">
+              <span aria-hidden="true">Précédent</span>
+            </a>
+          </li>
+        {% endif %}
+
+        {% for num in decisions.paginator.page_range %}
+          {% if decisions.number == num %}
+            <li class="page-item active">
+              <span class="page-link">{{ num }}</span>
+            </li>
+          {% elif num > decisions.number|add:'-3' and num < decisions.number|add:'3' %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+        {% if decisions.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ decisions.next_page_number }}" aria-label="Next">
+              <span aria-hidden="true">Suivant</span>
+            </a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ decisions.paginator.num_pages }}" aria-label="Last">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  // Animation au chargement
+  document.addEventListener('DOMContentLoaded', () => {
+    const rows = document.querySelectorAll('.decision-table tbody tr');
+    
+    rows.forEach((row, index) => {
+      row.style.opacity = '0';
+      row.style.transform = 'translateX(20px)';
+      
+      setTimeout(() => {
+        row.style.transition = `opacity 0.3s ease ${index * 0.05}s, transform 0.3s ease ${index * 0.05}s`;
+        row.style.opacity = '1';
+        row.style.transform = 'translateX(0)';
+      }, 100);
+    });
+  });
+</script>
+
+{% endblock %}
+{% endblock %}

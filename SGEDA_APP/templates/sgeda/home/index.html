@@ -1,0 +1,386 @@
+{% extends 'base.html' %}
+
+
+    {% block title %}
+    <title>SGEDA - Système de Gestion des Événements, Décisions et Actions</title>
+    <!-- Bootstrap 5 CSS -->
+    {% endblock %}
+
+
+{% block body %}
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark-color);
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .navbar-brand i {
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: var(--dark-color);
+            margin: 0 10px;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(67, 97, 238, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background-color: white;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .upcoming-events {
+            background-color: #f8f9fa;
+            padding: 60px 0;
+        }
+        
+        .event-card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .event-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .event-date {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        
+        .event-type {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .event-type.meeting {
+            color: var(--primary-color);
+        }
+        
+        .event-type.training {
+            color: var(--success-color);
+        }
+        
+        .footer {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 50px 0 20px;
+        }
+        
+        .footer-links h5 {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .footer-links ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+        }
+        
+        .copyright {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+        
+        .stats-counter {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+        
+        .stats-counter h2 {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .stats-counter p {
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+    </style>
+
+  {% include "sgeda/partials/header.html" %}
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1 class="display-4 fw-bold mb-4">Optimisez votre gestion d'événements et décisions</h1>
+                    <p class="lead mb-5">SGEDA vous offre une plateforme complète pour organiser vos réunions, formations, suivre les décisions et gérer les actions qui en découlent.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                      
+                        <a href="#" class="btn btn-outline-light btn-lg px-4">En savoir plus</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Dashboard" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="fw-bold mb-3">Une solution tout-en-un</h2>
+                    <p class="lead text-muted">Découvrez les fonctionnalités qui feront la différence dans votre organisation</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Gestion des réunions</h3>
+                        <p>Planifiez, organisez et suivez toutes vos réunions en un seul endroit avec gestion des participants et des comptes-rendus.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Formations</h3>
+                        <p>Créez et gérez vos programmes de formation avec suivi des inscriptions, évaluations et certifications.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <h3>Décisions & Actions</h3>
+                        <p>Enregistrez les décisions prises lors des réunions et assignez des actions avec suivi de leur réalisation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="stats-counter">
+                        <h2>1,250+</h2>
+                        <p>Réunions organisées</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-counter">
+                        <h2>580+</h2>
+                        <p>Formations dispensées</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-counter">
+                        <h2>3,450+</h2>
+                        <p>Décisions enregistrées</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-counter">
+                        <h2>8,750+</h2>
+                        <p>Actions réalisées</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Events -->
+    <section class="upcoming-events">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="fw-bold mb-3">Événements à venir</h2>
+                    <p class="lead text-muted">Découvrez les prochaines réunions et formations</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="event-card">
+                        <img src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" class="card-img-top" alt="Meeting">
+                        <div class="event-date">15 Juin</div>
+                        <div class="event-type meeting">Réunion</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Comité de direction</h5>
+                            <p class="card-text text-muted">Revue des objectifs trimestriels et planification stratégique.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted"><i class="fas fa-clock me-2"></i>09:00 - 12:00</small>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Détails</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="event-card">
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" class="card-img-top" alt="Training">
+                        <div class="event-date">20 Juin</div>
+                        <div class="event-type training">Formation</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Nouveaux outils collaboratifs</h5>
+                            <p class="card-text text-muted">Formation sur les dernières plateformes de travail collaboratif.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted"><i class="fas fa-clock me-2"></i>14:00 - 17:00</small>
+                                <a href="formation-inscription.html" class="btn btn-sm btn-primary">S'inscrire</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="event-card">
+                        <img src="https://images.unsplash.com/photo-1431540015161-0bf868a2d407?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" class="card-img-top" alt="Meeting">
+                        <div class="event-date">25 Juin</div>
+                        <div class="event-type meeting">Réunion</div>
+                        <div class="card-body">
+                            <h5 class="card-title">Revue de projet</h5>
+                            <p class="card-text text-muted">Point d'avancement sur le projet X et ajustements nécessaires.</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted"><i class="fas fa-clock me-2"></i>10:30 - 12:30</small>
+                                <a href="#" class="btn btn-sm btn-outline-primary">Détails</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <a href="#" class="btn btn-outline-primary">Voir tous les événements</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    {% include "sgeda/partials/footer.html" %}
+
+    
+    
+{% endblock %}

@@ -1,0 +1,473 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>SGEDA - Détails Réunion</title>
+{% endblock %}
+
+{% block body %}
+<style>
+    .reunion-header {
+        background: linear-gradient(135deg, #4a54e1, #15a1d1);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+        clip-path: polygon(0 0, 100% 0, 100% 90%, 0 100%);
+    }
+    
+    .reunion-badge {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+    
+    .detail-card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        margin-bottom: 2rem;
+    }
+    
+    .agenda-item {
+        display: flex;
+        padding: 1.5rem;
+        border-left: 3px solid #4a54e1;
+        margin-bottom: 1rem;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+    
+    .agenda-time {
+        flex: 0 0 120px;
+        font-weight: 600;
+        color: #4a54e1;
+    }
+    
+    .agenda-content {
+        flex: 1;
+    }
+    
+    .participant-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid white;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .decision-card {
+        border-left: 4px solid #4a54e1;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    }
+    
+    .action-card {
+        border-left: 4px solid var(--success-color);
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    }
+    
+    .document-card {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 1rem;
+        transition: var(--transition);
+    }
+    
+    .document-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .document-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f0f2ff;
+        border-radius: 10px;
+        margin-right: 1rem;
+        color: #4a54e1;
+        font-size: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .reunion-header {
+            padding: 3rem 0;
+            clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+        }
+        
+        .agenda-item {
+            flex-direction: column;
+        }
+        
+        .agenda-time {
+            margin-bottom: 0.5rem;
+        }
+    }
+</style>
+
+{% include "sgeda/partials/header.html" %}
+<div class="reunion-header">
+    <div class="container">
+        <span class="reunion-badge">{{ reunion.type_reunion }}</span>
+        <h1 class="display-4 fw-bold mb-3">{{ reunion.titre }}</h1>
+        <div class="d-flex flex-wrap align-items-center mb-4">
+            <div class="d-flex align-items-center me-4 mb-2">
+                <i class="far fa-calendar-alt me-2"></i>
+                <span>{{ reunion.date|date:"l d F Y" }}</span>
+            </div>
+            <div class="d-flex align-items-center me-4 mb-2">
+                <i class="far fa-clock me-2"></i>
+                <span>{{ reunion.heure_debut|time:"H:i" }} - {{ reunion.heure_fin|time:"H:i" }}</span>
+            </div>
+            <div class="d-flex align-items-center mb-2">
+                <i class="fas fa-map-marker-alt me-2"></i>
+                <span>{{ reunion.lieu }}</span>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap">
+            <a href="#participants" class="btn btn-light btn-lg px-4 me-2 mb-2">
+                <i class="fas fa-users me-2"></i>Participants
+            </a>
+            <a href="#decisions" class="btn btn-light btn-lg px-4 me-2 mb-2">
+                <i class="fas fa-clipboard-check me-2"></i>Décisions
+            </a>
+            <a href="#documents" class="btn btn-light btn-lg px-4 mb-2">
+                <i class="fas fa-file-alt me-2"></i>Documents
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="detail-card card mb-4">
+                <div class="card-body">
+                    <h4 class="mb-4">Ordre du jour</h4>
+                    
+                    {% for point in reunion.points_ordre_du_jour.all %}
+                    <div class="agenda-item">
+                        <div class="agenda-time">
+                            {{ point.heure|time:"H:i" }}
+                        </div>
+                        <div class="agenda-content">
+                            <h5>{{ point.titre }}</h5>
+                            <p class="mb-0">{{ point.description }}</p>
+                            {% if point.responsable %}
+                            <p class="mt-2 mb-0"><small>Présenté par: {{ point.responsable }}</small></p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="detail-card card mb-4" id="decisions">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">Décisions prises</h4>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDecisionModal">
+                            <i class="fas fa-plus me-2"></i>Ajouter
+                        </button>
+                    </div>
+                    
+                    {% for decision in reunion.decisions.all %}
+                    <div class="card mb-3 decision-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5>{{ decision.titre }}</h5>
+                                <span class="badge bg-light text-dark">
+                                    <i class="far fa-calendar-alt me-1"></i> {{ decision.date_limite|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                            <p>{{ decision.description }}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-light text-dark me-2">
+                                        <i class="fas fa-user me-1"></i> {{ decision.responsable }}
+                                    </span>
+                                    <span class="badge bg-{{ decision.get_statut_display }}">
+                                        {{ decision.get_statut_display }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary me-2">Modifier</button>
+                                    <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aucune décision enregistrée pour cette réunion</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="detail-card card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">Actions à suivre</h4>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addActionModal">
+                            <i class="fas fa-plus me-2"></i>Ajouter
+                        </button>
+                    </div>
+                    
+                    {% for action in reunion.actions.all %}
+                    <div class="card mb-3 action-card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <h5>{{ action.titre }}</h5>
+                                <span class="badge bg-light text-dark">
+                                    <i class="far fa-calendar-alt me-1"></i> {{ action.date_limite|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                            <p>{{ action.description }}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-light text-dark me-2">
+                                        <i class="fas fa-user me-1"></i> {{ action.responsable }}
+                                    </span>
+                                    <span class="badge bg-{{ action.get_statut_display }}">
+                                        {{ action.get_statut_display }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary me-2">Modifier</button>
+                                    <button class="btn btn-sm btn-outline-danger">Supprimer</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aucune action enregistrée pour cette réunion</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="detail-card card mb-4" id="participants">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">Participants</h4>
+                        <span class="badge bg-primary">{{ reunion.participants.count }}</span>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="avatar-group">
+                            {% for participant in reunion.participants.all %}
+                            <img src="{{ participant.photo }}" alt="{{ participant.nom }}" class="participant-avatar" title="{{ participant.nom }}">
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <ul class="list-group list-group-flush">
+                        {% for participant in reunion.participants.all %}
+                        <li class="list-group-item d-flex align-items-center">
+                            <img src="{{ participant.photo }}" alt="{{ participant.nom }}" class="rounded-circle me-3" width="40">
+                            <div>
+                                <h6 class="mb-0">{{ participant.nom }}</h6>
+                                <small class="text-muted">{{ participant.poste }}</small>
+                            </div>
+                            <div class="ms-auto">
+                                {% if participant.present %}
+                                <span class="badge bg-success">Présent</span>
+                                {% else %}
+                                <span class="badge bg-secondary">Absent</span>
+                                {% endif %}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="detail-card card mb-4">
+                <div class="card-body">
+                    <h4 class="mb-4">Informations</h4>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 text-primary">
+                                    <i class="fas fa-user-tie"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Animateur</h6>
+                                    <p class="mb-0">{{ reunion.animateur }}</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 text-primary">
+                                    <i class="fas fa-sticky-note"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Secrétaire</h6>
+                                    <p class="mb-0">{{ reunion.secretaire }}</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="mb-3">
+                            <div class="d-flex">
+                                <div class="flex-shrink-0 text-primary">
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">Statut</h6>
+                                    <p class="mb-0">
+                                        <span class="badge bg-{{ reunion.get_statut_display }}">
+                                            {{ reunion.get_statut_display }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="detail-card card mb-4" id="documents">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0">Documents</h4>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDocumentModal">
+                            <i class="fas fa-plus me-1"></i>Ajouter
+                        </button>
+                    </div>
+                    
+                    {% for document in reunion.documents.all %}
+                    <div class="document-card">
+                        <div class="document-icon">
+                            <i class="fas fa-file-{{ document.get_icon_type }}"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ document.nom }}</h6>
+                            <small class="text-muted">{{ document.taille }} • {{ document.date_ajout|date:"d/m/Y" }}</small>
+                        </div>
+                        <div>
+                            <a href="{{ document.fichier.url }}" class="btn btn-sm btn-outline-primary" download>
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aucun document joint à cette réunion</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="detail-card card">
+                <div class="card-body">
+                    <h4 class="mb-4">Prochaine réunion</h4>
+                    {% if prochaine_reunion %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0 bg-primary text-white p-3 rounded-3 text-center me-3">
+                            <div class="fw-bold">{{ prochaine_reunion.date|date:"d" }}</div>
+                            <div class="small">{{ prochaine_reunion.date|date:"M" }}</div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ prochaine_reunion.titre }}</h6>
+                            <small class="text-muted">
+                                <i class="far fa-clock me-1"></i> {{ prochaine_reunion.heure_debut|time:"H:i" }}
+                            </small>
+                        </div>
+                    </div>
+                    <a href="{% url 'reunion_detail' prochaine_reunion.id %}" class="btn btn-outline-primary w-100">Voir détails</a>
+                    {% else %}
+                    <div class="text-center py-2">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aucune réunion planifiée</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals -->
+<div class="modal fade" id="addDecisionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajouter une décision</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Titre</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Responsable</label>
+                            <select class="form-select">
+                                {% for participant in reunion.participants.all %}
+                                <option>{{ participant.nom }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Date limite</label>
+                            <input type="date" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+           
+           <ul>
+  {% for post in page_obj %}
+    <li>{{ post.title }} - {{ post.published_date }}</li>
+  {% endfor %}
+</ul>
+
+<!-- Pagination links -->
+<div class="pagination">
+  <span class="step-links">
+    {% if reunions.has_previous %}
+      <a href="?page=1">&laquo; first</a>
+      <a href="?page={{ reunions.previous_page_number }}">previous</a>
+    {% endif %}
+
+    <span class="current">
+      Page {{ reunions.number }} of {{ reunions.paginator.num_pages }}.
+    </span>
+
+    {% if reunions.has_next %}
+      <a href="?page={{ reunions.next_page_number }}">next</a>
+      <a href="?page={{ reunions.paginator.num_pages }}">last &raquo;</a>
+    {% endif %}
+  </span>
+</div>
+ {% include "sgeda/partials/footer.html" %}
+
+    
+    
+{% endblock %}

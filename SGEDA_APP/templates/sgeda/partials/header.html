@@ -1,0 +1,41 @@
+  <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-calendar-alt"></i>
+                SGEDA
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'home'  %}">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'page_reunions' %}">Réunions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'formations' %}">Formations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Décisions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'mes_taches' %}">Mes taches</a>
+                    </li>
+                </ul>
+                <div class="ms-lg-3 mt-3 mt-lg-0">
+
+                    {% if request.user.is_authenticated %}
+
+                    <a href="{% url 'deconnexion' %}" class="btn btn-outline-danger me-2">Déconnexion</a>
+                    {% else %}
+                    <a href="{% url 'connexion' %}" class="btn btn-outline-primary me-2">Connexion</a>
+                    {% endif %}
+                    <a href="{% url 'creer_compte' %}" class="btn btn-primary">Inscription</a>
+                </div>
+            </div>
+        </div>
+    </nav>

@@ -1,0 +1,58 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<style>
+  /* Mêmes styles que pour le formulaire de formation */
+</style>
+
+<div class="container">
+  <div class="form-container">
+    <div class="form-card">
+      <div class="form-header">
+        <h3><i class="fas fa-gavel me-2"></i> Planifier une Décision</h3>
+      </div>
+      
+      <div class="form-body">
+        <form method="post" action="{% url 'planifier_evenement' %}">
+          <input type="hidden" name="categorie" value="decision">
+          {% csrf_token %}
+          
+          <div class="form-group">
+            <label for="titre">Titre</label>
+            <input type="text" name="titre" id="titre" class="form-control" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="description-decision">Description</label>
+            <textarea name="description-decision" id="description-decision" class="form-control" rows="5" required></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="decideur">Décideur</label>
+            <input type="text" value="{{ request.user.nom }}" class="form-control" disabled>
+            <input type="hidden" name="decideur" value="{{ request.user.id }}">
+          </div>
+          
+          <div class="form-group">
+            <label for="reunion">Réunion associée</label>
+            <select name="reunion" id="reunion" class="form-control" required>
+              {% for reunion in reunions %}
+                <option value="{{ reunion.id }}">{{ reunion.titre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          
+          <div class="text-end mt-4">
+            <button type="submit" class="btn-submit">Enregistrer la décision</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% endblock %}

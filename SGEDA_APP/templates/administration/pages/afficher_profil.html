@@ -1,0 +1,176 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<style>
+  :root {
+    --primary: #6366f1;
+    --primary-light: #818cf8;
+    --dark: #1e293b;
+    --light: #f8fafc;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-container {
+    max-width: 800px;
+    margin: 2rem auto;
+  }
+
+  .profile-card {
+    border: none;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+  }
+
+  .profile-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    padding: 1.5rem;
+    color: white;
+  }
+
+  .profile-body {
+    padding: 2rem;
+    background-color: white;
+  }
+
+  .profile-img {
+    width: 180px;
+    height: 180px;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .profile-img:hover {
+    transform: scale(1.05);
+  }
+
+  .info-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .info-label {
+    font-weight: 600;
+    color: #64748b;
+    min-width: 150px;
+    display: inline-block;
+  }
+
+  .info-value {
+    color: var(--dark);
+  }
+
+  .badge-role {
+    background-color: rgba(99, 102, 241, 0.1);
+    color: var(--primary);
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+  }
+
+  .badge-function {
+    background-color: rgba(100, 116, 139, 0.1);
+    color: #64748b;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+  }
+
+  @media (max-width: 768px) {
+    .profile-body {
+      padding: 1.5rem;
+    }
+    
+    .profile-img {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 1.5rem;
+    }
+  }
+</style>
+
+<div class="container profile-container">
+  <div class="profile-card">
+    <div class="profile-header">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-user-circle fa-lg me-3"></i>
+        <h2 class="mb-0">Profil Utilisateur</h2>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="row align-items-center">
+        <!-- Photo de profil -->
+        <div class="col-md-4 text-center mb-4 mb-md-0">
+          <div class="position-relative d-inline-block">
+            {% if utilisateur.photo_de_profil %}
+              <a href="{{ utilisateur.photo_de_profil.url }}" class="d-block">
+                <img src="{{ utilisateur.photo_de_profil.url }}" 
+                     class="profile-img rounded-circle" 
+                     alt="Photo de profil">
+              </a>
+            {% else %}
+              <img src="{% static 'images/default_user.png' %}" 
+                   class="profile-img rounded-circle" 
+                   alt="Photo par défaut">
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Informations utilisateur -->
+        <div class="col-md-8">
+          <div class="info-item">
+            <span class="info-label">Nom complet</span>
+            <span class="info-value">{{ utilisateur.nom }} {{ utilisateur.prenom }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Rôle</span>
+            <span class="badge-role">{{ utilisateur.role }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Fonction</span>
+            <span class="badge-function">{{ utilisateur.fonction }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Département</span>
+            <span class="info-value">{{ utilisateur.departement }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ utilisateur.email|default:"Non renseigné" }}</span>
+          </div>
+
+          <div class="info-item border-0">
+            <span class="info-label">Mot de passe</span>
+            <span class="text-muted">••••••••••</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Animation au chargement
+  document.addEventListener('DOMContentLoaded', () => {
+    const card = document.querySelector('.profile-card');
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+      card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    }, 100);
+  });
+</script>
+
+{% endblock %}
+{% endblock %}

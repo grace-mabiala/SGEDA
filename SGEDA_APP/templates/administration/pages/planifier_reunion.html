@@ -1,0 +1,83 @@
+{% extends "administration/layouts/base.html" %}
+{% load static %}
+
+{% block content %}
+{% block main %}
+
+<style>
+  /* Mêmes styles que pour le formulaire de formation */
+</style>
+
+<div class="container">
+  <div class="form-container">
+    <div class="form-card">
+      <div class="form-header">
+        <h3><i class="fas fa-users me-2"></i> Planifier une Réunion</h3>
+      </div>
+      
+      <div class="form-body">
+        <form method="post" action="{% url 'planifier_evenement' %}" enctype="multipart/form-data">
+          <input type="hidden" name="categorie" value="reunion">
+          {% csrf_token %}
+          
+          <div class="form-group">
+            <label for="titre">Titre</label>
+            <input type="text" name="titre" id="titre" class="form-control" required>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="type">Type</label>
+                <select name="type" id="type" class="form-control">
+                  {% for code,type in STATUT_CHOICES4 %}
+                    <option value="{{ code }}">{{ type }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="salle">Salle</label>
+                <select name="salle" id="salle" class="form-control">
+                  {% for salle in salles %}
+                    <option value="{{ salle.numero }}">{{ salle.nom }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="debut-reunion">Date de début</label>
+                <input type="datetime-local" name="debut-reunion" id="debut-reunion" class="form-control" required>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="fin-reunion">Date de fin</label>
+                <input type="datetime-local" name="fin-reunion" id="fin-reunion" class="form-control" required>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="ordre-jour">Ordre du jour (PDF)</label>
+            <input type="file" name="ordre-jour" id="ordre-jour" class="form-control" required>
+          </div>
+          
+          <div class="text-end mt-4">
+            <button type="submit" class="btn-submit">Enregistrer la réunion</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% endblock %}

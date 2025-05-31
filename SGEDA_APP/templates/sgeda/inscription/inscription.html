@@ -1,0 +1,600 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>SGEDA - Inscription Formation</title>
+{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --primary-color: #4361ee;
+        --primary-light: #f0f2ff;
+        --secondary-color: #3f37c9;
+        --accent-color: #4cc9f0;
+        --dark-color: #1a1a2e;
+        --light-color: #f8f9fa;
+        --success-color: #4bb543;
+        --border-radius: 12px;
+        --box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .registration-container {
+        background-color: #f9fafc;
+        min-height: 100vh;
+        padding: 0;
+    }
+
+    .registration-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 5rem 0;
+        clip-path: ellipse(100% 100% at 50% 0%);
+    }
+
+    .registration-card {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        transform: translateY(-50px);
+        margin-bottom: 2rem;
+        transition: var(--transition);
+    }
+
+    .registration-card:hover {
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .formation-badge {
+        background-color: var(--accent-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-bottom: 1rem;
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin: 2rem 0 3rem;
+    }
+
+    .progress-steps::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background-color: #e0e0e0;
+        z-index: 1;
+    }
+
+    .step {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        width: 30px;
+        height: 30px;
+        line-height: 30px;
+        border-radius: 50%;
+        background-color: #e0e0e0;
+        color: white;
+        font-weight: bold;
+    }
+
+    .step.active {
+        background-color: var(--primary-color);
+    }
+
+    .step.completed {
+        background-color: var(--success-color);
+    }
+
+    .step-label {
+        position: absolute;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        font-size: 0.8rem;
+        color: var(--dark-color);
+    }
+
+    .form-control, .form-select {
+        height: 50px;
+        border-radius: var(--border-radius);
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem 1.25rem;
+        transition: var(--transition);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+    }
+
+    .form-floating label {
+        padding: 0.75rem 1.25rem;
+        color: #6c757d;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        letter-spacing: 0.5px;
+        transition: var(--transition);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+    }
+
+    .btn-outline-primary {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+        background-color: var(--primary-light);
+    }
+
+    .form-section {
+        display: none;
+    }
+
+    .form-section.active {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+
+    .summary-item {
+        display: flex;
+        margin-bottom: 1rem;
+    }
+
+    .summary-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: var(--primary-color);
+    }
+
+    .feature-card {
+        background-color: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .feature-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .confirmation-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background-color: var(--success-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        color: white;
+        font-size: 2rem;
+    }
+
+    .floating-label {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .floating-label input, .floating-label select, .floating-label textarea {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius);
+        background-color: #f9f9f9;
+        transition: var(--transition);
+    }
+
+    .floating-label label {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        color: #6c757d;
+        transition: var(--transition);
+        pointer-events: none;
+    }
+
+    .floating-label input:focus, 
+    .floating-label select:focus,
+    .floating-label textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+    }
+
+    .floating-label input:focus + label,
+    .floating-label input:not(:placeholder-shown) + label,
+    .floating-label select:focus + label,
+    .floating-label select:not([value=""]) + label {
+        top: -0.5rem;
+        left: 0.8rem;
+        font-size: 0.8rem;
+        background-color: white;
+        padding: 0 0.3rem;
+        color: var(--primary-color);
+    }
+
+    @media (max-width: 768px) {
+        .registration-header {
+            padding: 3rem 0;
+            clip-path: ellipse(150% 100% at 50% 0%);
+        }
+        
+        .registration-card {
+            transform: translateY(-30px);
+        }
+    }
+</style>
+
+<div class="registration-container">
+    <!-- Header Section -->
+    <div class="registration-header text-center">
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-3">Inscription à la formation</h1>
+            <p class="lead">Rejoignez notre communauté d'apprenants</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="registration-card bg-white">
+                    <!-- Progress Steps -->
+                    <div class="card-header">
+                        <div class="progress-steps">
+                            <div class="step active" id="step1">
+                                <span>1</span>
+                                <div class="step-label">Informations</div>
+                            </div>
+                            <div class="step" id="step2">
+                                <span>2</span>
+                                <div class="step-label">Paiement</div>
+                            </div>
+                            <div class="step" id="step3">
+                                <span>3</span>
+                                <div class="step-label">Confirmation</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4 p-md-5">
+                        <!-- Formation Summary -->
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="flex-shrink-0">
+                                <img src="{{ formation.image }}" alt="{{ formation.intitule }}" class="rounded-3" width="80">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <span class="formation-badge">{{ formation.categorie }}</span>
+                                <h4 class="mb-1">{{ formation.intitule }}</h4>
+                                <div class="d-flex text-muted">
+                                    <span class="me-3"><i class="far fa-calendar-alt me-1"></i> {{ formation.date_de_debut }}</span>
+                                    <span><i class="far fa-clock me-1"></i> {{ formation.duree }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Multi-step Form -->
+                        <form id="registrationForm">
+                            <!-- Step 1: Personal Information -->
+                            <div class="form-section active" id="section1">
+                                <h5 class="mb-4">Vos informations personnelles</h5>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <div class="floating-label">
+                                            <input type="text" id="firstName" placeholder=" " required>
+                                            <label for="firstName">Prénom</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="floating-label">
+                                            <input type="text" id="lastName" placeholder=" " required>
+                                            <label for="lastName">Nom</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="floating-label">
+                                            <input type="email" id="email" placeholder=" " required>
+                                            <label for="email">Email</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="floating-label">
+                                            <input type="tel" id="phone" placeholder=" ">
+                                            <label for="phone">Téléphone</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="floating-label">
+                                            <input type="text" id="company" placeholder=" ">
+                                            <label for="company">Entreprise/Organisation</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="floating-label">
+                                            <input type="text" id="position" placeholder=" ">
+                                            <label for="position">Poste occupé</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-navigation">
+                                    <button type="button" class="btn btn-outline-primary" disabled>Précédent</button>
+                                    <button type="button" class="btn btn-primary next-btn">Suivant</button>
+                                </div>
+                            </div>
+
+                            <!-- Step 2: Payment Information -->
+                            <div class="form-section" id="section2">
+                                <h5 class="mb-4">Méthode de paiement</h5>
+                                
+                                <div class="mb-4">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="creditCard" checked>
+                                        <label class="form-check-label" for="creditCard">
+                                            <i class="fab fa-cc-visa me-2"></i>Carte de crédit
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="paypal">
+                                        <label class="form-check-label" for="paypal">
+                                            <i class="fab fa-paypal me-2"></i>PayPal
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="paymentMethod" id="bankTransfer">
+                                        <label class="form-check-label" for="bankTransfer">
+                                            <i class="fas fa-university me-2"></i>Virement bancaire
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="creditCardForm">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <div class="floating-label">
+                                                <input type="text" id="cardNumber" placeholder=" " pattern="\d{16}">
+                                                <label for="cardNumber">Numéro de carte</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="floating-label">
+                                                <input type="text" id="cardName" placeholder=" ">
+                                                <label for="cardName">Nom sur la carte</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="floating-label">
+                                                <input type="text" id="cardExpiry" placeholder=" " pattern="\d{2}/\d{2}">
+                                                <label for="cardExpiry">MM/AA</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="floating-label">
+                                                <input type="text" id="cardCvc" placeholder=" " pattern="\d{3}">
+                                                <label for="cardCvc">CVC</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-check mt-4 mb-4">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label" for="terms">
+                                        J'accepte les <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">conditions générales</a>
+                                    </label>
+                                </div>
+
+                                <div class="form-navigation">
+                                    <button type="button" class="btn btn-outline-primary prev-btn">Précédent</button>
+                                    <button type="button" class="btn btn-primary next-btn">Payer {{ formation.prix }} €</button>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Confirmation -->
+                            <div class="form-section text-center" id="section3">
+                                <div class="confirmation-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <h3 class="mb-3">Inscription confirmée !</h3>
+                                <p class="text-muted mb-4">Merci pour votre inscription à la formation <strong>{{ formation.intitule }}</strong>. Nous vous avons envoyé un email de confirmation avec tous les détails.</p>
+                                
+                                <div class="row text-start mb-4">
+                                    <div class="col-md-6">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-calendar-check"></i>
+                                            </div>
+                                            <h5>Prochaine étape</h5>
+                                            <p class="text-muted">Vous recevrez les informations de connexion 48h avant le début de la formation.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="feature-card">
+                                            <div class="feature-icon">
+                                                <i class="fas fa-question-circle"></i>
+                                            </div>
+                                            <h5>Questions ?</h5>
+                                            <p class="text-muted">Notre équipe est disponible pour répondre à vos questions à contact@sgeda.com</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <a href="{% url 'formations' %}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-left me-2"></i>Retour aux formations
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms Modal -->
+<div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsModalLabel">Conditions générales</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Modal content same as before -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">J'ai compris</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Multi-step form functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const formSections = document.querySelectorAll('.form-section');
+        const steps = document.querySelectorAll('.step');
+        const nextButtons = document.querySelectorAll('.next-btn');
+        const prevButtons = document.querySelectorAll('.prev-btn');
+        let currentStep = 0;
+
+        // Show current section and update progress steps
+        function showSection(index) {
+            formSections.forEach(section => section.classList.remove('active'));
+            formSections[index].classList.add('active');
+            
+            steps.forEach((step, i) => {
+                if (i < index) {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                } else if (i === index) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+        }
+
+        // Next button click handler
+        nextButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                if (validateSection(currentStep)) {
+                    currentStep++;
+                    if (currentStep >= formSections.length) {
+                        currentStep = formSections.length - 1;
+                    }
+                    showSection(currentStep);
+                }
+            });
+        });
+
+        // Previous button click handler
+        prevButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                currentStep--;
+                if (currentStep < 0) {
+                    currentStep = 0;
+                }
+                showSection(currentStep);
+            });
+        });
+
+        // Simple validation for each section
+        function validateSection(index) {
+            let isValid = true;
+            const currentSection = formSections[index];
+            const requiredInputs = currentSection.querySelectorAll('input[required], select[required]');
+            
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    input.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+
+            if (index === 1 && !document.getElementById('terms').checked) {
+                document.getElementById('terms').classList.add('is-invalid');
+                isValid = false;
+            } else {
+                document.getElementById('terms').classList.remove('is-invalid');
+            }
+
+            return isValid;
+        }
+
+        // Payment method toggle
+        const paymentMethods = document.querySelectorAll('input[name="paymentMethod"]');
+        const creditCardForm = document.getElementById('creditCardForm');
+        
+        paymentMethods.forEach(method => {
+            method.addEventListener('change', function() {
+                if (this.id === 'creditCard') {
+                    creditCardForm.style.display = 'block';
+                } else {
+                    creditCardForm.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
+{% include "sgeda/partials/footer.html" %}
+{% endblock %}
