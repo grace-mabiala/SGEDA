@@ -16,12 +16,13 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
+
           MYSQL_DATABASE: ${{ env.DB_NAME }}
           MYSQL_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
-        ports:
-          - 3306:3306
+
 
     steps:
+
       - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
