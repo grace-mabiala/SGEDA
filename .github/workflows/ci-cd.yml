@@ -1,4 +1,4 @@
-name: Django CI with MySQL (Secure)
+name: Django CI with MySQL
 
 on: [push, pull_request]
 
@@ -15,10 +15,7 @@ jobs:
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         ports:
           - 3306:3306
-        options: >-
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - uses: actions/checkout@v4
@@ -39,12 +36,9 @@ jobs:
         pip install -r requirements.txt
 
     - name: Wait for MySQL to be ready
-      env:
-        DB_USER: ${{ secrets.MYSQL_USER }}
-        DB_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
       run: |
         for i in {1..30}; do
-          if mysqladmin ping -h 127.0.0.1 -u "$DB_USER" -p"$DB_PASSWORD" --silent; then
+          if mysqladmin ping -h 127.0.0.1 -u ${{ secrets.MYSQL_USER }} -p${{ secrets.MYSQL_PASSWORD }} --silent; then
             echo "MySQL is ready!"
             break
           fi
@@ -52,17 +46,16 @@ jobs:
           sleep 2
         done
 
-    - name: Create .env file from Secrets
+    - name: Create .env file
       env:
-        SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+        DB_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
       run: |
         echo "DB_NAME=${{ secrets.MYSQL_DATABASE }}" > .env
         echo "DB_USER=${{ secrets.MYSQL_USER }}" >> .env
-        echo "DB_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env
+        echo "DB_PASSWORD=$DB_PASSWORD" >> .env
         echo "DB_HOST=127.0.0.1" >> .env
         echo "DB_PORT=3306" >> .env
-        echo "SECRET_KEY=$SECRET_KEY" >> .env
-        # Protection du fichier .env
+        echo "SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }}" >> .env
         chmod 600 .env
 
     - name: Run migrations
