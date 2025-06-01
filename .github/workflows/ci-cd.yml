@@ -1,9 +1,9 @@
-name: Django CI with MySQL
+name: Django CI with MySQL & Docker
 
 on: [push, pull_request]
 
 env:
-  DOCKER_COMPOSE_FILE: docker-compose.yml
+  DOCKER_COMPOSE_VERSION: 'v2.23.0'  # Version spécifique de Docker Compose
 
 jobs:
   test:
@@ -12,9 +12,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Étape 1: Installer Docker et Docker Compose
+      - name: Set up Docker
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version  # Vérification
 
+      # Étape 2: Créer le fichier .env avec les secrets
       - name: Create .env file
         run: |
           echo "DB_NAME=${{ secrets.DB_NAME }}" > .env
@@ -23,17 +32,20 @@ jobs:
           echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
           echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
 
+      # Étape 3: Builder et lancer les conteneurs
       - name: Build and start containers
         run: |
-          docker-compose -f $DOCKER_COMPOSE_FILE build
-          docker-compose -f $DOCKER_COMPOSE_FILE up -d
+          docker-compose -f docker-compose.yml build
+          docker-compose -f docker-compose.yml up -d
+          docker ps  # Optionnel: vérifier les conteneurs
 
-      - name: Run migrations
-        run: docker-compose -f $DOCKER_COMPOSE_FILE exec web python manage.py migrate
+      # Étape 4: Exécuter les tests Django
+      - name: Run Django tests
+        run: |
+          docker-compose exec web python manage.py migrate
+          docker-compose exec web python manage.py test
 
-      - name: Run tests
-        run: docker-compose -f $DOCKER_COMPOSE_FILE exec web python manage.py test
-
-      - name: Stop containers
+      # Nettoyage (toujours exécuté, même en cas d'échec)
+      - name: Cleanup
         if: always()
-        run: docker-compose -f $DOCKER_COMPOSE_FILE down
+        run: docker-compose down
