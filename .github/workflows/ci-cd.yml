@@ -2,32 +2,38 @@ name: Django CI with MySQL
 
 on: [push, pull_request]
 
+env:
+  DOCKER_COMPOSE_FILE: docker-compose.yml
+
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_USER: ${{ secrets.DB_USER }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_HOST: ${{ secrets.DB_HOST || '127.0.0.1' }}  # Valeur par défaut
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-
-          MYSQL_DATABASE: ${{ env.DB_NAME }}
-          MYSQL_ROOT_PASSWORD: ${{ env.DB_PASSWORD }}
-
 
     steps:
-
       - uses: actions/checkout@v4
-      - name: Install dependencies
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Create .env file
         run: |
-          pip install python-dotenv
-          pip install -r requirements.txt
+          echo "DB_NAME=${{ secrets.DB_NAME }}" > .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+          echo "DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}" >> .env
+          echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
+
+      - name: Build and start containers
+        run: |
+          docker-compose -f $DOCKER_COMPOSE_FILE build
+          docker-compose -f $DOCKER_COMPOSE_FILE up -d
+
+      - name: Run migrations
+        run: docker-compose -f $DOCKER_COMPOSE_FILE exec web python manage.py migrate
+
       - name: Run tests
-        run: |
-          python manage.py test
+        run: docker-compose -f $DOCKER_COMPOSE_FILE exec web python manage.py test
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f $DOCKER_COMPOSE_FILE down

@@ -3,3 +3,4 @@ SGEDA_APP/__pycache__/
 SGEDA_APP/migrations/
 venv/
 media/
+.env
