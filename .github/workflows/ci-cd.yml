@@ -1,55 +1,56 @@
-name: Django CI with MySQL & Docker
+name: Django CI
 
 on: [push, pull_request]
 
 env:
-  DOCKER_COMPOSE_VERSION: 'v2.23.0'  # Version spécifique de Docker Compose
+  DB_NAME: testdb
+  DB_USER: root
+  DB_HOST: 127.0.0.1
+  DB_PORT: 3306
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testdb
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      # Étape 1: Installer Docker et Docker Compose
-      - name: Set up Docker
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Install Docker Compose
-        run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version  # Vérification
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential python3-dev python3-pip python3-setuptools python3-wheel
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
 
-      # Étape 2: Créer le fichier .env avec les secrets
-      - name: Create .env file
-        run: |
-          echo 'DB_NAME=${{ secrets.DB_NAME }}' > .env
-          echo 'DB_USER=${{ secrets.DB_USER }}' >> .env
-          echo 'DB_PASSWORD=${{ secrets.DB_PASSWORD }}' >> .env
-          echo 'DB_ROOT_PASSWORD=${{ secrets.DB_ROOT_PASSWORD }}' >> .env
-          echo 'SECRET_KEY=${{ secrets.SECRET_KEY }}' >> .env
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y default-libmysqlclient-dev
 
-      # Étape 3: Builder et lancer les conteneurs
-      - name: Build and start containers
-        run: |
-          docker-compose -f docker-compose.yml build
-          docker-compose -f docker-compose.yml up -d
-          docker ps  # Optionnel: vérifier les conteneurs
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      # Étape 4: Exécuter les tests Django
-      - name: Run Django tests
-        run: |
-          docker-compose exec web python manage.py migrate
-          docker-compose exec web python manage.py test
+    - name: Create .env file
+      run: |
+        echo "DB_NAME=${{ secrets.DB_NAME }}" > .env
+        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+        echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> .env
 
-      # Nettoyage (toujours exécuté, même en cas d'échec)
-      - name: Cleanup
-        if: always()
-        run: docker-compose down
+    - name: Run migrations
+      run: python manage.py migrate
+
+    - name: Run tests
+      run: python manage.py test
+
